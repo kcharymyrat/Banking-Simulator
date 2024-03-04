@@ -1,0 +1,8 @@
+type: framework
+content:
+  - Registration
+  - User database and in-account authorization
+  - Hashing and protecting user data
+  - "API, currency exchange rates"
+  - Technical Support Chat
+current_task: 0

@@ -1,0 +1,68 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>Creating a banking application involves several stages, and the first one is registration. In this stage, we collect user data and store it for re-checking before the final registration. We must obtain the data and retain it securely for future verification. Only after our users enter their username and password again without errors, the registration is successful! The program will congratulate the user upon successful account registration and end.</p>
+<h5 id="objectives">Objectives</h5>
+<p>In this stage, your program should satisfy the following conditions:</p>
+<ul>
+<li>Ask for their username by printing <code class="java">Username:</code>, then ask for their password: <code class="java">Password:</code> and save both values.</li>
+<li>After this, print an empty line to make your output more readable.</li>
+<li>After successfully entering both username and password, prompt to enter the data again by printing: <code class="java">Enter the data again to complete the registration</code>.</li>
+<li>Repeat Step 1.</li>
+<li>Compare the first data with the second. If the usernames or passwords do not match, print an error message. Password error <code class="java">Passwords don't match</code>. Username error: <code class="java">Username doesn't match</code>. If both options are not correct: <code class="java">Username and password don't match</code>. If both usernames and passwords are the same, print the message after the empty line <code class="java">Congratulations on your successful registration!</code></li>
+<li>End the program in case of a data entry error or successful registration.</li>
+</ul>
+<h5 id="examples">Examples</h5>
+<p>The greater-than symbol followed by a space (<code class="java">&gt; </code>) represents the user input. Note that it's not part of the input.</p>
+<p><strong>Example 1: </strong><em>Complete registration</em></p>
+<pre><code class="language-no-highlight">Username:
+&gt; DogeViper
+Password:
+&gt; FastDoge1999
+
+Enter the data again to complete the registration
+Username:
+&gt; DogeViper
+Password:
+&gt; FastDoge1999
+
+Congratulations on your successful registration!</code></pre>
+<p><strong>Example 2: </strong><em>Password doesn't match</em></p>
+<pre><code class="language-no-highlight">Username:
+&gt; Amsterdog
+Password:
+&gt; MrDOOO!
+
+Enter the data again to complete the registration
+Username:
+&gt; Amsterdog
+Password:
+&gt; MrDOO!
+
+Passwords don't match</code></pre>
+<p><strong>Example 3: </strong><em>Username doesn't match</em></p>
+<pre><code class="language-no-highlight">Username:
+&gt; Sam
+Password:
+&gt; MrSam!12 19
+
+Enter the data again to complete the registration
+Username:
+&gt; MrSam
+Password:
+&gt; MrSam!12 19
+
+Username doesn't match</code></pre>
+<p><strong>Example 4: </strong><em>Password and Username don't match</em></p>
+<pre><code class="language-no-highlight">Username:
+&gt; Sam
+Password:
+&gt; MrSam!12 19
+
+Enter the data again to complete the registration
+Username:
+&gt; MrSam
+Password:
+&gt; MrSam!12  19
+
+Username and password don't match.</code></pre>
+</div>

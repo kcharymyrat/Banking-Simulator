@@ -1,0 +1,20 @@
+type: hyperskill
+title: Banking Simulator
+language: English
+summary: "<div><div class=\"alert alert-primary\">You will practice concepts frequently\
+  \ tested in technical interviews at top tech companies.</div>\r\n<p>The banking\
+  \ system is quite complex. However, we could develop a console application that\
+  \ could perform essential banking functions. Although it wouldn't be a full-fledged\
+  \ online banking system, we could still store our users' data in a database and\
+  \ create custom user registration and authorization scenarios similar to those used\
+  \ in existing banking apps. It would also include a support chat feature, enabling\
+  \ customers to receive prompt assistance whenever they encounter difficulties. Additionally,\
+  \ we could add a feature that allows users to check the exchange rates of various\
+  \ currencies. These combined features would provide a comprehensive banking experience\
+  \ that users could customize.</p></div><br/><br/>Learn more at <a href=\"https://hyperskill.org/projects/386?utm_source=ide&utm_medium=ide&utm_campaign=ide&utm_content=project-card\"\
+  >https://hyperskill.org/projects/386</a>"
+programming_language: Java
+programming_language_version: 11
+content:
+  - Banking Simulator
+mode: Study

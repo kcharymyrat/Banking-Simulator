@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Banking_Simulator.iml" filepath="$PROJECT_DIR$/.idea/modules/Banking_Simulator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Banking Simulator/task/Banking_Simulator.Banking_Simulator-task.iml" filepath="$PROJECT_DIR$/.idea/modules/Banking Simulator/task/Banking_Simulator.Banking_Simulator-task.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Banking Simulator/task/Banking_Simulator.Banking_Simulator-task.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Banking Simulator/task/Banking_Simulator.Banking_Simulator-task.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Banking Simulator/task/Banking_Simulator.Banking_Simulator-task.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Banking Simulator/task/Banking_Simulator.Banking_Simulator-task.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Banking_Simulator.util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Banking_Simulator.util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Banking_Simulator.util.main.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Banking_Simulator.util.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/Banking_Simulator.util.test.iml" filepath="$PROJECT_DIR$/.idea/modules/util/Banking_Simulator.util.test.iml" />
+    </modules>
+  </component>
+</project>

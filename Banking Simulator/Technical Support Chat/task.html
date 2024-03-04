@@ -1,0 +1,364 @@
+<div class="step-text">
+<p> </p>
+<h5 id="description">Description</h5>
+<p>You are truly amazing! Just like conquering Everest, small steps lead to outstanding achievements. Every step you take on your journey of knowledge and growth is significant, no matter how small. Do you remember where it all began? Now, as we reach the final stage, let's reflect on what we've accomplished:</p>
+<p>Implemented user registration and authorization, developed a prototype database to store client information, learned how to store passwords securely using cryptography, and integrated the app with our API to provide real-time exchange rates.</p>
+<p>Let's talk about the final stage. Have you ever found yourself in a situation where an application isn't working as expected? I'm sure you've thought: <em>I wish I could get an answer immediately.</em> We won't hire technical support for our training project, but we can still make a difference.<br/>
+Let's introduce a new feature to our application — the chat with expert consultation.</p>
+<p>A random question simulation will be initiated upon entering the chat support menu. Our operator will provide responses based on the simulated questions. Your task is to implement the logic for generating accurate answers in response to the random questions posed by the simulation.</p>
+<h5 id="objectives">Objectives:</h5>
+<ul>
+<li>You need to develop the chat logic and prepare responses for the operator based on a predefined list of questions:</li>
+</ul>
+<ol>
+<li><em>How do I activate my card?</em></li>
+<li><em>How can I check the balance on my card?</em></li>
+<li><em>What should I do if my card has been stolen?</em></li>
+<li><em>How can I block my card?</em></li>
+<li><em>What should I do if I lose my card?</em></li>
+<li><em>How do I order a new card?</em></li>
+<li><em>How can I update my personal information in my account?</em></li>
+<li><em>What should I do if I forget my card's password?</em></li>
+<li><em>How can I withdraw cash using my card?</em></li>
+<li><em>How can I transfer money from one card to another?</em></li>
+<li><em>How can I check the recent transactions on my card?</em></li>
+<li><em>What should I do if I receive an incorrect card statement?</em></li>
+<li><em>How can I set transaction limits on my card?</em></li>
+<li><em>How can I change my card's PIN code?</em></li>
+<li><em>How can I set up transaction notifications for my card?</em></li>
+</ol>
+<ul>
+<li>Our menu now looks like this:</li>
+</ul>
+<pre><code class="java">Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit</code></pre>
+<ul>
+<li>If the user makes an error while choosing a menu item number, tell them:</li>
+</ul>
+<pre><code class="language-no-highlight">Select a menu item, [num] 1, 2, 3, 4:</code></pre>
+<ul>
+<li>Create a new menu item:</li>
+</ul>
+<pre><code class="language-no-highlight">Security Settings</code></pre>
+<ul>
+<li>Create the sub-menu items for this new menu:</li>
+</ul>
+<pre><code class="language-no-highlight">1. Change Password, 2. Access Settings, 3. Back:</code></pre>
+<p><code class="java">3. Back</code> returns the user to the main menu.</p>
+<h5 id="change-password-this-is-a-new-method-that-you-need-to-implement">Change Password - This is a new method that you need to implement:</h5>
+<p>If you select this item, request the user's current password:<br/>
+<code class="java">Enter your current password:</code></p>
+<p>Next request a new password:<br/>
+<code class="java">Enter your new password:</code></p>
+<p>If the password is changed, display the following message:<br/>
+<code class="java">Password successfully changed.</code></p>
+<p>If the password change fails, print the following message:<br/>
+<code class="java">Failed to change password. Please check your current password or login and try again.</code></p>
+<p>If the old and new passwords are the same, display:<br/>
+<code class="java">Current and new passwords are the same! Password cannot be changed.</code></p>
+<p>After a successful or unsuccessful password change, redirect the user to the main menu, but there is an exception:</p>
+<p>In case the user enters a new password that does not match the format during the password change, output the following:</p>
+<pre><code class="java">//Empty line
+Incorrect password format
+Enter your new password: &gt; /*new password*/
+</code></pre>
+<p>Repeat the prompt for the correct password until you enter a password that matches the requirements.</p>
+<ul>
+</ul>
+<p><strong>Hint:</strong> Ensure the password validity during this process. Passwords must be stored correctly in the database.</p>
+<p><strong>Hint:</strong> Don't forget to hash the password during the change process. You're updating two database partitions, not just one.</p>
+<ul>
+<li><code class="java">Access Settings</code> contains the last unsuccessful login attempts:
+
+	<p>A hint! If Access section is empty, In the database, it must have the following record format: <code class="java">Access: []</code></p>
+<ul>
+<li>Show the registration time: <code class="java">You registered on: yyyy-MM-dd HH:mm</code></li>
+<li>If the Access section is empty, show: <code class="java">No suspicious activity detected</code></li>
+<li>Redirect the user to the main menu afterward.</li>
+</ul>
+</li>
+<li>For any input other than suggested menu items, prompt for re-entry:</li>
+</ul>
+<pre><code class="language-no-highlight">Invalid option. Please try again.
+Select a menu item, [num] 1, 2, 3:</code></pre>
+<ul>
+<li>Implement the last menu — <code class="java">Chat Support</code> and create sub-items for this menu:
+
+	<ul>
+<li><code class="java">1. Send Message, 2. Back:</code> Choosing <code class="java">1</code> initiates the simulation and randomly selects a question, followed by an operator's response.</li>
+<li>A chat question should start like this: <code class="java">[Simulation] some question</code></li>
+</ul>
+</li>
+<li>Implement logic for operator responses:
+	<ul>
+<li>After starting a chat session, append the time to every message, for example: <code class="java">Some chat message... dd-MM-yyyy HH:mm:ss</code></li>
+<li>Before the operator joins the chat, show: <code class="java">System message: Operator NAME is connected</code>, <code class="java">NAME</code> is the operator's name.</li>
+<li>An operator's response looks like this: <code class="java">NAME: some text</code></li>
+<li>After the operator's response, display the message <code class="java">System message: Did you get an answer to your question? (Y/N)</code>. If the answer is <code class="java">Y</code>, the chat ends, and the client is redirected to the main menu. If the answer is <code class="java">N</code>, simulate two possible options:
+		<ul>
+<li>First case: Show a message and then redirect to the main menu: <code class="java">System message: We're sorry, but no operators are currently available. Please contact us later.</code></li>
+<li>Second case: Show a message and ask if the user wants to ask another question: <code class="java">System message: Ask another question? (Y/N)</code>. If <code class="java">Y</code>, restart the random question simulation; if <code class="java">N</code>, redirect to the main menu.</li>
+<li>If the user's response doesn't match the suggested options, display: <code class="java">Invalid input</code></li>
+<li>After the chat ends, display the message: <code class="java">System message: Chat completed. Redirecting to the main menu.</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Avoid repeating simulation questions. If all questions have been asked, display: <code class="java">System message: Simulation completed dd-MM-yyyy HH:mm:ss</code>. After this, redirect the user to the menu; new chat attempts are unavailable.</li>
+</ul>
+<p><strong>Hint:</strong> Responses don't need to be lengthy. For instance, the answer to the first question could be <em>Activation possible via phone or at the nearest bank branch.</em></p>
+<p><strong>Hint:</strong> Utilize the regular expressions to identify matches in simulation questions. The rule of three can be helpful. For example, <em>how can I change my card's PIN code?</em> use (change, card, PIN).</p>
+<p>There are simple response requirements that you need to consider:</p>
+<ul>
+<li>The operator must provide a unique response for the client;</li>
+<li>A response should have a length between 40 and 140 characters;</li>
+<li>The response must be in English;</li>
+<li>The response should not be entirely in uppercase;</li>
+<li>The following chars can be used: <code class="java">! ? , . - ) ( " '</code></li>
+</ul>
+<p>For testing purposes, create a file in the main project folder called <em>userData.txt; your</em> database must store and read data from the specified file.</p>
+<h5 id="examples">Examples:</h5>
+<p>The greater-than symbol followed by a space (<code class="java">&gt; </code>) represents the user input. Note that it's not part of the input.</p>
+<p><em>What a chat can look like</em></p>
+<p><strong>Example 1:</strong></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt; 1
+
+Authorization
+Login: &gt; (1) 568 488 4502
+Password: &gt; 6CZvpXrceR8zVJ
+Authorization successful
+ZZzzzzZ... ERROR... It's a joke, it's ok, welcome back!
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 1
+
+Exchange rates
+1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+&gt; 5
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 2
+
+Chat
+1. Send Message, 2. Back
+&gt; 2
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 3
+
+Security Settings
+1. Change Password, 2. Access Settings, 3. Back:
+&gt; 3
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 2
+
+Chat
+1. Send Message, 2. Back
+&gt; {
+
+Invalid choice.
+1. Send Message, 2. Back: &gt; p
+
+Invalid choice.
+1. Send Message, 2. Back: &gt; Q
+
+Invalid choice.
+1. Send Message, 2. Back: &gt; 1
+[Simulation] How can I block my card? 26-07-2023 23:19:01
+System message: Operator Sam is connected 26-07-2023 23:19:01
+Sam: 'answer' 26-07-2023 23:19:01
+System message: Did you get an answer to your question? (Y/N) 26-07-2023 23:19:01
+&gt; n
+System message: We're sorry, but there are currently no available operators, please contact us later. 26-07-2023 23:19:01
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 2
+
+Chat
+1. Send Message, 2. Back
+&gt; 1
+[Simulation] How can I change my card's PIN code? 26-07-2023 23:19:01
+System message: Operator Sam is connected 26-07-2023 23:19:01
+Sam: 'answer' 26-07-2023 23:19:01
+System message: Did you get an answer to your question? (Y/N) 26-07-2023 23:19:01
+&gt; n
+System message: Ask another question? (Y/N) 26-07-2023 23:19:01
+&gt; y
+[Simulation] How can I set transaction limits on my card? 26-07-2023 23:19:01
+System message: Operator Sam is connected 26-07-2023 23:19:01
+Sam: 'answer' 26-07-2023 23:19:01
+System message: Did you get an answer to your question? (Y/N) 26-07-2023 23:19:01
+&gt; n
+System message: Ask another question? (Y/N) 26-07-2023 23:19:01
+&gt; y
+[Simulation] How can I update my personal information in my account? 26-07-2023 23:19:01
+System message: Operator Sam is connected 26-07-2023 23:19:01
+Sam: 'answer' 26-07-2023 23:19:01
+System message: Did you get an answer to your question? (Y/N) 26-07-2023 23:19:01
+&gt; n
+System message: Ask another question? (Y/N) 26-07-2023 23:19:01
+&gt; y
+[Simulation] How can I transfer money from one card to another? 26-07-2023 23:19:01
+System message: Operator Sam is connected 26-07-2023 23:19:01
+Sam: 'answer' 26-07-2023 23:19:01
+System message: Did you get an answer to your question? (Y/N) 26-07-2023 23:19:01
+&gt; n
+System message: We're sorry, but there are currently no available operators, please contact us later. 26-07-2023 23:19:01
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 4
+Goodbye!
+</code></pre>
+<p><strong>Example 2:</strong></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt; 1
+
+Authorization
+Login: &gt; +(1)-413-518-7933
+Password: &gt;
+The entered password does not match the login or the user does not exist.
+
+Login: &gt; +(1)-413-518-7933
+Password: &gt; f2sQVrYt2
+Authorization successful
+Good to see you!
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 1
+
+Exchange rates
+1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+&gt; 5
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 2
+
+Chat
+1. Send Message, 2. Back
+&gt; 2
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 3
+
+Security Settings
+1. Change Password, 2. Access Settings, 3. Back:
+&gt; 3
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 3
+
+Security Settings
+1. Change Password, 2. Access Settings, 3. Back:
+&gt; 2
+You have been registered: 2023-07-26 23:19
+Unsuccessful access attempt - 2023-07-26 23:19
+Unsuccessful access attempt - 2023-07-26 23:19
+Unsuccessful access attempt - 2023-07-26 23:19
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 3
+
+Security Settings
+1. Change Password, 2. Access Settings, 3. Back:
+&gt; 1
+
+Enter your current password: &gt; f2sQVrYt2
+Enter your new password: &gt; f2sQVrYt2
+Current and new passwords are the same! Password cannot be changed!
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 4
+Goodbye!
+
+</code></pre>
+<p><strong>Example 3:</strong></p>
+<pre><code class="language-no-highlight">
+
+Would you like to login or register?
+1. Login, 2. Register: &gt; 1
+
+Authorization
+Login: &gt; +(1)-628-468-9981
+Password: &gt; dmd5Ff$@QpIeY4H jst
+Authorization successful
+Good to see you!
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 3
+
+Security Settings
+1. Change Password, 2. Access Settings, 3. Back:
+&gt; ~
+
+Invalid option. Please try again.
+Select a menu item: [num] 1, 2, 3:
+&gt; Y
+
+Invalid option. Please try again.
+Select a menu item: [num] 1, 2, 3:
+&gt; 1
+
+Enter your current password: &gt; (zkk_*7!6V
+Enter your new password: &gt; 5Yy8$!ekTA$0JR33KP ei0bG#
+Failed to change password. Please check your current password or login and try again.
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 3
+
+Security Settings
+1. Change Password, 2. Access Settings, 3. Back:
+&gt; 1
+
+Enter your current password: &gt; dmd5Ff$@QpIeY4H jst
+Enter your new password: &gt; yFCawpRD
+
+Incorrect password format
+Enter your new password: &gt; jV0c]f=)x7e
+
+Incorrect password format
+Enter your new password: &gt; :~" -G*Fu. Pj%+mU#|:s!
+
+Incorrect password format
+Enter your new password: &gt; d~e\!g? /~w!E&gt;(AAGt,N7\E
+
+Incorrect password format
+Enter your new password: &gt; 0aZvrx,V;`Tjjx]68
+
+Incorrect password format
+Enter your new password: &gt; 9P(r|.n7Ivg($Y;,QNZA}
+
+Incorrect password format
+Enter your new password: &gt; 5D*2xFF/C-Q} 1
+
+Incorrect password format
+Enter your new password: &gt; G!|T oNg;@;Q|?M$T
+
+Incorrect password format
+Enter your new password: &gt; @@W80QD9!dXbPiM
+Password successfully changed.
+
+Menu
+1. Exchange Rates, 2. Chat Support, 3. Security Settings, 4. Exit
+&gt; 4
+Goodbye!
+
+</code></pre>
+</div>

@@ -1,0 +1,167 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>We have implemented registration and authorization and learned how to store data. However, we have not yet addressed a very important point: the password is the key to your bank account, so it is essential that we take steps to protect it.</p>
+<p>We can do this by using a password hashing function, which makes it very difficult for attackers to guess a password by brute force. We must not let attackers even get close to cracking our clients' passwords. We are professionals, so let's write the necessary functionality and add new authorization features.</p>
+<p>How the database might look at this stage:</p>
+<p>Where <code class="java">|</code> is a special character for separating user data into sections.</p>
+<pre><code class="language-no-highlight">
+Login: +(1) 123 123 3333| Password: H7zhSEcK3ATrndB7gvJmd5Zbqtiwk9lrhcyeHhUEk5Y=| Salt: pTXvgvjebxPh2qLRqIdvoZuX8TxyR3u+ZEoRhFubgG8=| Registration time: 2023-06-01 17:26| Last authorization session: 2023-06-01 17:26| Access: [Unsuccessful access attempt - 2023-08-01 11:26, Unsuccessful access attempt - 2023-08-01 12:26, Unsuccessful access attempt - 2023-08-01 13:26]
+Login: 1 342 343 5544| Password: Of9ciui/5d/Tlv94m+cVCx5wdWG1QbRqMldPRNSvnvc=| Salt: DRySPA7xv3oTxBzFDUTgzkuDGVSxlioRizzuxlQ7xXM=| Registration time: 2023-06-01 17:27| Last authorization session: 2023-06-01 17:27| Access: [Unsuccessful access attempt - 2023-01-01 13:26]
+Login: +1 123 111 2244| Password: +cJpNBhVw/9nklUJiGl36h6acxPPVN3ceKY8Yqf5HsY=| Salt: YxEDuvdMheUUlhU7vUdA3Omr0S4zUx4Zj85+qlAy9d8=| Registration time: 2023-06-01 17:27| Last authorization session: 2023-06-01 17:27| Access: []
+</code></pre>
+<h5 id="objectives">Objectives</h5>
+<ol>
+<li>To hash the password using the <strong>PBKDF2 (Password-Based Key Derivation Function 2)</strong> algorithm with <strong>HMAC-SHA256</strong>, you can create the following methods:
+
+	<ul>
+<li>Method for generating salt: This method will generate a random salt value.</li>
+</ul>
+<ul>
+<li>Method for password hashing: The password will be hashed using the PBKDF2 algorithm and the salt provided as an argument.</li>
+</ul>
+<ul>
+<li>Method for registrations: The password is hashed and entered into the database during the first registration.</li>
+</ul>
+<ul>
+<li>Method for password verification: In this method, the entered password will be hashed using the same salt as the stored password hash, and then the generated hash will be compared with the stored hash.</li>
+</ul>
+<ul>
+<li>Method for saving to a database: It can take a string type argument Login, hashed password, salt, registration time, list for save failed attempts to access the account.</li>
+</ul>
+<ul>
+<li>Method for updating last authorization: To update an entry in a user block in a section <code class="java">Last authorization session:</code>.</li>
+</ul>
+<p>Create a file in the main project folder called <em>userData.txt</em> for testing purposes. Your database must store and read data from the specified file.</p>
+<ul>
+<li>The method for loading credentials from a file is to load the data from the database.</li>
+</ul>
+</li>
+</ol>
+<p>Authorization:</p>
+<p>Implement new user authorization functions.</p>
+<ul>
+<li>When launching the application, you must ask the user if he wants to log in or register:</li>
+</ul>
+<pre><code class="language-no-highlight">Would you like to login or register?
+1. Login, 2. Register:</code></pre>
+<ul>
+<li> If the user makes a mistake and selects a missing option from the provided selection, then inform them about it and ask him to try again:</li>
+</ul>
+<pre><code class="language-no-highlight">Invalid input, try again '1 or 2':</code></pre>
+<ul>
+<li>After logging in, generate a random greeting:</li>
+</ul>
+<pre><code class="language-no-highlight">Welcome to your personal banking
+Welcome back!
+We've been waiting for you!
+Good to see you!
+ZZzzzzZ... ERROR... It's a joke, it's ok, welcome back!</code></pre>
+<p><br/>
+You can make your list of phrases. Creativity is always welcome! But creativity should not take more than 60 characters :)</p>
+<ul>
+<li>Add a section to the database for each user with the name <code class="java">Access:</code></li>
+<li>Add an entry for each incorrect password entry:</li>
+</ul>
+<pre><code class="language-no-highlight">Unsuccessful access attempt - yyyy-MM-dd HH:mm</code></pre>
+<ul>
+<li>The <code class="java">Access</code> section can only contain the last 3 attempts; interacting with this section will come in handy for the last step of project creation.</li>
+<li>If the user is in the database, write an error message to the Access section,</li>
+<li>However, there should not be any information about this in the console. Such tricks are used for the user to receive a notification that someone tried to log into the account using his login.</li>
+</ul>
+<p>However, this user will not be able to understand whether there is a person with such a phone number in the user base; this is done to save private data.</p>
+<ul>
+<li>After authorization and greetings, you need to create a menu section that will be fully disclosed in the remaining stages, at first, it will be enough:</li>
+</ul>
+<pre><code class="language-no-highlight">Menu
+1. Logout</code></pre>
+<p><br/>
+That will allow the user to end his session in the application and log out of his account.</p>
+<ul>
+<li>Once completed, say goodbye to the user :</li>
+</ul>
+<pre><code class="language-no-highlight">Goodbye</code></pre>
+<ul>
+<li>If the user made a mistake, inform about it by displaying a message:</li>
+</ul>
+<pre><code class="language-no-highlight">Invalid choice. Please enter a valid option number '1':</code></pre>
+<ul>
+<li>Add a section to the database for each user with the name</li>
+</ul>
+<pre><code class="java">Last authorization session:</code></pre>
+<ul>
+<li>If the authorization attempt fails, a message should be displayed in the console:</li>
+</ul>
+<pre><code class="java">The entered password does not match the login or the user does not exist.</code></pre>
+<ul>
+</ul>
+<h5 id="examples">Examples</h5>
+<p>The greater-than symbol followed by a space (<code class="java">&gt; </code>) represents the user input. Note that it's not part of the input.</p>
+<p><strong>Example 1: </strong><em>An error when trying to register using a phone number that is already in the database</em></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt; 2
+
+Registration
+Login: &gt; +(1)3215478888
+
+Login is already taken, try another login.
+Login: &gt; +1-1233214444
+Password: &gt; P@ss !w111
+
+Enter the data again to complete the registration
+Login: &gt; +1-1233214444
+Password: &gt; P@ss !w111
+
+Congratulations on your successful registration!
+Now you can log in!
+
+Authorization
+Login: &gt; +1-1233214444
+Password: &gt; FGFff1! 23!
+Authorization successful
+
+ZZzzzzZ... ERROR... It's a joke, it's ok, welcome back!
+Menu
+1. Logout
+&gt; 1
+Goodbye
+
+</code></pre>
+<p><strong>Example 2: </strong><em>Wrong entry in the main menu</em></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt; 1
+
+Authorization
+Login: &gt; 1 113 544 4411
+Password: &gt; GreatPassword 321!!
+Authorization successful
+
+We've been waiting for you!
+Menu
+1. Logout
+&gt; L
+Invalid choice. Please enter a valid option number '1':
+&gt; 1
+Goodbye
+
+</code></pre>
+<p><strong>Example 3: </strong><em>Errors when choosing a section</em></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt;
+Invalid input, try again '1 or 2':&gt; D
+Invalid input, try again '1 or 2':&gt;
+Invalid input, try again '1 or 2':&gt; 1
+
+Authorization
+Login: &gt; (1) 160 715 5251
+Password: &gt; 4PPQD x
+Authorization successful
+
+Good to see you!
+Menu
+1. Logout
+&gt; 1
+Goodbye</code></pre>
+</div>

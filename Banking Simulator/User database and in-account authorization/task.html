@@ -1,0 +1,124 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>In the previous stage, we implemented user registration and handled some errors that users might make. However, the app should not crash if the user makes a mistake.</p>
+<p>In addition, we need to store customer data. In addition to registration, we will also add authorization. We must give users clear instructions and error messages to create a quality application. For example, we should not allow users to enter <code class="java">cabbage</code> in the login field. Therefore, we will need to standardize user input. We will learn how to filter the customer data so that each customer is unique, which is standard practice in banking.</p>
+<p>How a database might look in your file:</p>
+<pre><code class="language-no-highlight">    Login: +1 231 233 3333, Password: Secret98 password, Registration time: 2023-05-31 15:30
+    Login: +1-231-233-4444, Password: Mysecurepassword123, Registration time: 2023-05-31 11:32
+    Login: +1-231-233-5555, Password: P@ssw0rd!, Registration time: 2023-05-31 09:15</code></pre>
+<h5 id="objectives">Objectives</h5>
+<ol>
+<li>Submit an authorization form <code class="java">Login:</code> <code class="java">Password:</code></li>
+<li>Let's change the <code class="java">Username</code> field to <code class="java">Login</code>, and now the user will enter his personal phone number, which allows you to make each client unique. HashMap will help us with this.</li>
+<li>We will store the client database in a file you create using the <code class="java">File</code> functionality or directly in the development environment.</li>
+<li>If a user with this login already exists in the database, display the message <code class="java">Login is already taken, try another login</code>. And then ask for input again.</li>
+<li>The first time you successfully enter data, your program should request them again, displaying this message: <code class="java">Now you can log in for finishing the registration.</code></li>
+<li>To finish registration user should be able to log in and enter the login and password. After that, the program should display the two messages: <code class="java">Authorization successful</code>and <code class="java">Congratulations on your successful registration!</code></li>
+<li>If you failed to authorization, no matter whether the password or login was entered incorrectly, you should display the message: <code class="java">Authorization failed</code>. After that, your program should end</li>
+</ol>
+<p>Hint: when implementing the method of checking the login for uniqueness, don't forget to consider the same parameters; for example, these numbers are the same: +1 231 233 3333 and 12312333333. The devil is in the phones and the details.</p>
+<p>Another hint: If the user received a message about successful registration, it would be strange if the data was not saved in the database.</p>
+<p>The phone number format must follow the USA regional number standard:</p>
+<ul>
+<li>The phone number must only start with the number <code class="java">1</code>.</li>
+<li>The phone number can contain the <code class="java">+</code> sign.</li>
+<li>The phone number can be without the <code class="java">+</code> and <code class="java">-</code> signs, for example, <code class="java">X XXX XXX XXXX</code> or <code class="java">XXXXXXXXXXX</code>.</li>
+<li>The number must only be 11 digits long.</li>
+<li>If the user encloses a group of digits in parentheses, only one group can be enclosed in parentheses in the phone number.<br/>
+    For example, <code class="java">(X)-XXX-XXX-XXXX</code> is allowed while <code class="java">X-XXX-(XXX)-XXXX</code> is invalid.</li>
+<li>The phone number should not have a space at the beginning or end.</li>
+<li>The allowed characters in the phone number are:
+    <ul>
+<li><code class="java">+</code> can only be at the beginning of the number.</li>
+<li><code class="java">-</code> serves as a separator between groups of digits.
+        <ul>
+<li>Should not be at the beginning or end of the number.</li>
+<li>Can separate a group of digits consisting of a single number. Example: <code class="java">X-XXX...</code></li>
+<li>Can separate a group of digits consisting of three numbers. Example: <code class="java">X-XXX-XXX...</code></li>
+<li>Can separate a group of digits consisting of four numbers. Example: <code class="java">X-XXX-XXX-XXXX</code></li>
+<li>Can be replaced with a space while adhering to the aforementioned requirements.</li>
+</ul>
+</li>
+<li>The number can contain only four groups of digits <code class="java">X XXX XXX XXXX</code> or one group of digits <code class="java">XXXXXXXXXXX</code> separated. <code class="java">X XXX XXXXXXX</code> is wrong.</li>
+</ul>
+</li>
+</ul>
+<p>Password:</p>
+<p> The password should meet the following requirements:</p>
+<ol>
+<li>It must contain at least one uppercase letter, one lowercase letter, and at least one digit.</li>
+<li>It may contain special characters such as !, @, #, $, %, or not.</li>
+<li>It can include spaces, but not at the beginning or end of the password.</li>
+<li>It should consist only of Latin alphabet letters.</li>
+<li>The length of the password should be at least 6 characters and not exceed 28 characters.</li>
+<li>In case of incorrect login or password input, it is necessary to prompt for re-entry and display a warning about incorrect data format. Invalid Login: <code class="java">Wrong login format, try again</code>. Invalid Password: <code class="java">Wrong password format, try again</code></li>
+</ol>
+<p>For testing purposes, create a file in the main project folder called <em>userData.txt; your</em> database must store and read data from the specified file.</p>
+<h5 id="examples">Examples</h5>
+<p>The greater-than symbol followed by a space (<code class="java">&gt; </code>) represents the user input. Note that it's not part of the input.</p>
+<p><strong>Example 1: </strong><em>Complete registration and authorization and some wrong data</em></p>
+<pre><code class="language-no-highlight">
+Registration
+Login: &gt; 19123308852
+Password: &gt; $zr885Wjyr$bVWEWg43y U$
+
+Enter the data again to complete the registration
+Login: &gt; 12222123362
+Password: &gt; zr885Wjyr$bVWEWg43y U$
+
+Login and password don't match.
+Login: &gt; 12222123362
+Password: &gt; $zr885Wjyr$bVWEWg43y U$
+
+Login doesn't match.
+Login: &gt; 19123308852
+Password: &gt; LOONGPASSSSSSSSSSSSSS
+
+Passwords don't match.
+Login: &gt; 19123308852
+Password: &gt; $zr885Wjyr$bVWEWg43y U$
+
+Now you can log in for finishing the registration.
+Login: &gt; 19123308852
+Password: &gt; $zr885Wjyr$bVWEWg43y U$
+Authorization successful
+Congratulations on your successful registration!
+
+</code></pre>
+<p><strong>Example 2: </strong><em>Failed authorization</em></p>
+<pre><code class="language-no-highlight">
+
+Registration
+Login: &gt; (1) 607 197 6404
+Login is already taken, try another login.
+Login: &gt; 10789280356
+Password: &gt; 7ctw70kWf2#KcIeSgoL!1Dbr
+
+Enter the data again to complete the registration
+Login: &gt; 10789280356
+Password: &gt; 7ctw70kWf2#KcIeSgoL!1Dbr
+
+Now you can log in for finishing the registration.
+Login: &gt; 19269628087
+Password: &gt; AFewe2MxeZjV!xWGaUjxAyu
+Authorization failed
+
+</code></pre>
+<p><strong>Example 3: </strong><em>Complete registration and authorization without any fails</em></p>
+<pre><code class="language-no-highlight">
+
+Registration
+Login: &gt; 15599397240
+Password: &gt; @gQlCh%0uB!
+
+Enter the data again to complete the registration
+Login: &gt; 15599397240
+Password: &gt; @gQlCh%0uB!
+
+Now you can log in for finishing the registration.
+Login: &gt; 15599397240
+Password: &gt; @gQlCh%0uB!
+Authorization successful
+Congratulations on your successful registration!
+</code></pre>
+</div>

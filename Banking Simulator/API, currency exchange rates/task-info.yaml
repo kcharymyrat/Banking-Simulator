@@ -1,0 +1,960 @@
+type: edu
+files:
+  - name: src/banking/MainBank.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.util.ArrayList;
+      import java.util.List;
+      import java.util.Scanner;
+      
+      public class MainBank {
+          static List<String> list = new ArrayList<>();
+          private static final Scanner scanner = new Scanner(System.in);
+      
+          public static void main(String[] args) {
+      
+              System.out.println("Username:");
+              list.add(getInput());
+      
+              System.out.println("Password:");
+              list.add(getInput());
+      
+              System.out.println();
+              System.out.println("Enter the data again to complete the registration");
+      
+              System.out.println("Username:");
+              String login = getInput();
+      
+              System.out.println("Password:");
+              String pass = getInput();
+      
+              var name = list.get(0).equals(login);
+              var pas = list.get(1).equals(pass);
+      
+              if (name && pas) {
+                  System.out.println(System.lineSeparator() + "Congratulations on your successful registration!");
+              } else if (!name && !pas) {
+                  System.out.println("Username and password don't match.");
+              } else {
+                  if (!pas) {
+                      System.out.println("Passwords don't match.");
+                  } else {
+                      System.out.println("Username doesn't match.");
+                  }
+              }
+              scanner.close();
+          }
+      
+          private static String getInput() {
+              return scanner.nextLine().strip().trim();
+          }
+      }
+    learner_created: false
+  - name: test/LocalServer.java
+    visible: false
+    text: |-
+      import com.sun.net.httpserver.HttpExchange;
+      import com.sun.net.httpserver.HttpHandler;
+      import com.sun.net.httpserver.HttpServer;
+      
+      import java.io.IOException;
+      import java.io.OutputStream;
+      import java.net.InetSocketAddress;
+      import java.util.Arrays;
+      import java.util.Random;
+      
+      public class LocalServer { //Create local server for testing
+          public final String CONFIRM = "ASDcvv14Dfvv67539a551345n2l34kjklhv012";
+      
+          private final StringBuilder responseBuilder = new StringBuilder();
+      
+          public LocalServer() {
+              try {
+                  HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+                  server.createContext("/hyperskill-exchange/api", new CurrencyExchangeHandler());
+                  server.setExecutor(Runnable::run);
+                  server.start();
+      
+                  for (String s : Arrays.asList("EUR", "GBP", "UAH", "CNY")) {
+                      responseBuilder.append(getFakeApiResponse(s)).append("\n");
+                  }
+              } catch (Exception e) {
+                  throw new RuntimeException(e);
+              }
+          }
+      
+          private String getFakeApiResponse(String currency) {
+              String num;
+              if (currency.equalsIgnoreCase("EUR")) {
+                  num = "0.9" + (random(49) + 49);
+              } else if (currency.equalsIgnoreCase("GBP")) {
+                  num = "0.7" + (random(59) + 39);
+              } else if (currency.equalsIgnoreCase("UAH")) {
+                  num = "36." + (random(599) + 399);
+              } else {
+                  num = "7." + (random(100) + 99);
+              }
+              return String.format("{\"rates\":{\"USD\":%s},\"base\":\"%s\"}", num, currency);
+          }
+      
+          private int random(int range) {
+              return new Random().nextInt(range);
+          }
+      
+          private class CurrencyExchangeHandler implements HttpHandler {
+      
+              @Override
+              public void handle(HttpExchange exchange) throws IOException {
+                  String[] uris = exchange.getRequestURI().toString().split("/");
+      
+                  if (uris.length == 4) {
+                      String apiKey = uris[uris.length - 1].replace("latest.json?app_id=", "");
+                      if (uris[3].startsWith("latest.json") && apiKey.equals(CONFIRM)) {
+                          exchange.getResponseHeaders().set("Content-Type", "application/json");
+                          String response = responseBuilder.toString();
+                          exchange.sendResponseHeaders(200, response.length());
+                          OutputStream os = exchange.getResponseBody();
+                          os.write(response.getBytes());
+                          os.close();
+                      } else {
+                          String response = "Invalid key: " + apiKey;
+                          exchange.sendResponseHeaders(404, response.length());
+                          OutputStream os = exchange.getResponseBody();
+                          os.write(response.getBytes());
+                          os.close();
+                      }
+                  } else {
+                      String response = "Invalid request";
+                      exchange.sendResponseHeaders(400, response.length());
+                      OutputStream os = exchange.getResponseBody();
+                      os.write(response.getBytes());
+                      os.close();
+                  }
+              }
+          }
+      }
+    learner_created: false
+  - name: test/MainBankTest.java
+    visible: false
+    text: |-
+      import org.hyperskill.hstest.dynamic.DynamicTest;
+      import org.hyperskill.hstest.exception.outcomes.WrongAnswer;
+      import org.hyperskill.hstest.stage.StageTest;
+      import org.hyperskill.hstest.testcase.CheckResult;
+      import org.hyperskill.hstest.testing.TestedProgram;
+      
+      import javax.crypto.SecretKeyFactory;
+      import javax.crypto.spec.PBEKeySpec;
+      import java.io.BufferedReader;
+      import java.io.File;
+      import java.io.IOException;
+      import java.io.InputStreamReader;
+      import java.net.HttpURLConnection;
+      import java.net.MalformedURLException;
+      import java.net.ProtocolException;
+      import java.net.URL;
+      import java.nio.file.Files;
+      import java.nio.file.Path;
+      import java.security.MessageDigest;
+      import java.security.NoSuchAlgorithmException;
+      import java.security.spec.InvalidKeySpecException;
+      import java.util.*;
+      import java.util.regex.Pattern;
+      
+      import static org.hyperskill.hstest.testing.expect.Expectation.expect;
+      
+      public class MainBankTest extends StageTest<String> {
+          private final HashSet<String> currency = new HashSet<>(List.of("EUR", "GBP", "UAH", "CNY"));
+          private String testingFirstLogin;
+          private String testingFirstPassword;
+      
+          private String testingSecondLogin;
+          private String testingSecondPassword;
+      
+          private String testingThirdLogin;
+          private String testingThirdPassword;
+          private String getCurrency;
+          private final File FILE = new File("userData.txt");
+          private TestedProgram main;
+      
+          @DynamicTest
+          CheckResult test1() {
+              Runnable runnable = LocalServer::new;
+              runnable.run();
+              getCurrency = initLocalServer();
+              try {
+                  Files.writeString(FILE.toPath(), "");
+              } catch (IOException e) {
+                  throw new WrongAnswer("Before testing file 'userData.txt' must be empty! Failed to access file.");
+              }
+              startInit();
+              testingFirstLogin = generatePhone(true);
+              testingFirstPassword = generatePassword(true);
+      
+              testingSecondLogin = generatePhone(true);
+              testingSecondPassword = generatePassword(true);
+      
+              testingThirdLogin = generatePhone(true);
+              testingThirdPassword = generatePassword(true);
+              initNewPerson(testingFirstLogin, testingFirstPassword);
+      
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test2() {
+              startInit();
+              String output = main.execute("1");
+      
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              authorize(testingFirstLogin, testingFirstPassword);
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test3() {
+              startInit();
+              var login = "+1-321-555-1111";
+              var password = "Tt123!";
+              String output = main.execute("1");
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              output = main.execute(login);
+              majorTestingMethod("Password:", 1, 1, output);
+      
+              output = main.execute(password);
+              majorTestingMethod("The entered password does not match the login or the user does not exist.", 3, 1, output);
+              majorTestingMethod("Login:", 3, 3, output);
+      
+              authorize(testingFirstLogin, testingFirstPassword);
+      
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test4() {
+              startInit();
+              for (int i = 0; i < randomize(13); i++) {
+                  String output = main.execute("");
+                  majorTestingMethod("Invalid input, try again '1 or 2':", 1, 1, output);
+                  output = main.execute(forAnyCase[new Random().nextInt(forAnyCase.length - 1)].toString().replaceAll("\\d", ""));
+                  majorTestingMethod("Invalid input, try again '1 or 2':", 1, 1, output);
+              }
+              initNewPerson(testingSecondLogin, testingSecondPassword);
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test5() {
+              startInit();
+              String output = main.execute("2");
+              majorTestingMethod("Registration", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              output = main.execute(testingThirdLogin);
+              majorTestingMethod("Password:", 1, 1, output);
+              output = main.execute(testingThirdPassword);
+              majorTestingMethod("Enter the data again to complete the registration.", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              //      for line equal to Password
+              output = main.execute(generatePhone(true));
+              majorTestingMethod("Password:", 1, 1, output);
+              //Login and password don't match.
+      
+              output = main.execute(generatePassword(true));
+              majorTestingMethod("Login and password don't match.", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              output = main.execute(generatePhone(true));
+              majorTestingMethod("Password:", 1, 1, output);
+              output = main.execute(testingThirdPassword);
+              majorTestingMethod("Login doesn't match.", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              output = main.execute(testingThirdLogin);
+              majorTestingMethod("Password:", 1, 1, output);
+              output = main.execute(generatePassword(true));
+              majorTestingMethod("Password doesn't match.", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              output = main.execute(testingThirdLogin);
+              majorTestingMethod("Password:", 1, 1, output);
+              output = main.execute(testingThirdPassword);
+              majorTestingMethod("Congratulations on your successful registration!", 5, 1, output);
+              majorTestingMethod("Now you can log in!", 5, 2, output);
+              majorTestingMethod("Authorization", 5, 4, output);
+              majorTestingMethod("Login:", 5, 5, output);
+      
+              for (int i = 0; i < 2; i++) {
+                  output = main.execute(testingThirdLogin);
+                  majorTestingMethod("Password:", 1, 1, output);
+                  output = main.execute(generatePassword(true));
+                  majorTestingMethod("The entered password does not match the login or the user does not exist.", 3, 1, output);
+      
+                  majorTestingMethod("Login:", 3, 3, output);
+              }
+              authorize(testingThirdLogin, testingThirdPassword);
+              return CheckResult.correct();
+          }
+      
+          private void correctCurrency(String login, String password) {
+              startInit();
+              String output = main.execute("1");
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              output = main.execute(login);
+              majorTestingMethod("Password:", 1, 1, output);
+      
+              output = main.execute(password);
+              majorTestingMethod("Authorization successful.", 5, 1, output);
+              if (output.split("\n")[2].length() > 60) {
+                  throw new WrongAnswer("Your creativity '" + output.split("\n")[2].length() + "' - exceeds the 60 character limit, try shortening the message a bit");
+              }
+              majorTestingMethod("Menu", 5, 4, output);
+              majorTestingMethod("1. Exchange rates, 2. Logout", 5, 5, output);
+      
+              output = main.execute("1");
+              majorTestingMethod("Exchange rates", 2, 1, output);
+              majorTestingMethod("1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back", 2, 2, output);
+              for (int i = 0; i < randomize(10); i++) {
+                  output = main.execute(forAnyCase[new Random().nextInt(forAnyCase.length - 1)].toString().replaceAll("\\d", ""));
+                  majorTestingMethod("Incorrect currency code, try again.", 2, 1, output);
+                  majorTestingMethod("(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):", 2, 2, output);
+              }
+          }
+      
+          @DynamicTest(repeat = 50)
+          CheckResult test6() {
+              correctCurrency(testingFirstLogin, testingFirstPassword);
+              var random = randomize(currency.size());
+              int getCurrencyNum = random == 0 ? random + 1 : random;
+              String output = main.execute(String.valueOf(getCurrencyNum));
+      
+              String compare = null;
+              for (var set : currency) {
+                  if (output.split("\n")[0].contains(set)) {
+                      compare = parseExchangeRate(getCurrency, set);
+                      break;
+                  }
+              }
+      
+              if (compare != null && !compare.toLowerCase().trim().equals(output.split("\n")[0].toLowerCase().trim())) {
+                  throw new WrongAnswer("Your output of this currency does not match the HTTP request from our local server, Your HTTP response: '" + output.split("\n")[0] + "'\n" + "Correct HTTP response: " + compare + "\nAlso, do not forget about the correct apikey, case is important! apiKey -" + apiKey);
+              }
+              majorTestingMethod("Would you like to choose another currency? (Y/N)", 3, 3, output);
+              for (int j = 0; j < randomize(7) + 3; j++) {
+                  output = main.execute(forAnyCase[new Random().nextInt(forAnyCase.length - 1)].toString().replaceAll("[yYnN]", "NO I AM NOT"));
+                  majorTestingMethod("Invalid input! (Y/N)", 1, 1, output);
+              }
+              output = main.execute("y");
+      
+              majorTestingMethod("1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back", 1, 1, output);
+              output = main.execute("5");
+      
+              majorTestingMethod("Menu", 2, 1, output);
+              majorTestingMethod("1. Exchange rates, 2. Logout", 2, 2, output);
+              for (int i = 0; i < randomize(10); i++) {
+                  output = main.execute(forAnyCase[randomize(forAnyCase.length - 1)].toString().replaceAll("[1-2]", "NO I AM NOT"));
+                  majorTestingMethod("Invalid choice. Please enter a valid option number '1' or '2':", 1, 1, output);
+              }
+              output = main.execute("2");
+              majorTestingMethod("Goodbye", 1, 1, output);
+      
+              if (!main.isFinished()) {
+                  throw new WrongAnswer("Your program should finish");
+              }
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test7() {
+      
+              correctCurrency(testingSecondLogin, testingSecondPassword);
+              String output;
+              for (int i = 1; i < 5; i++) {
+                  for (int j = 0; j < 3; j++) {
+                      int getCurrencyNum = randomize(currency.size()) + 1;
+                      output = main.execute(String.valueOf(getCurrencyNum));
+      
+                      String compare = null;
+                      for (var set : currency) {
+                          if (output.split("\n")[0].contains(set)) {
+                              compare = parseExchangeRate(getCurrency, set);
+                              break;
+                          }
+                      }
+      
+                      if (compare != null && !compare.toLowerCase().trim().equals(output.split("\n")[0].toLowerCase().trim())) {
+                          throw new WrongAnswer("Your output of this currency does not match the HTTP request from our local server, Your HTTP response: '" + output.split("\n")[0] + "'\n" + "Correct HTTP response: " + compare + "\nAlso, do not forget about the correct apikey, case is important! apiKey -" + apiKey);
+                      }
+                      majorTestingMethod("Would you like to choose another currency? (Y/N)", 3, 3, output);
+                      output = main.execute("y");
+                      majorTestingMethod("1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back", 1, 1, output);
+                  }
+                  output = main.execute("5");
+                  majorTestingMethod("Menu", 2, 1, output);
+                  majorTestingMethod("1. Exchange rates, 2. Logout", 2, 2, output);
+      
+                  output = main.execute("1");
+                  majorTestingMethod("Exchange rates", 2, 1, output);
+                  majorTestingMethod("1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back", 2, 2, output);
+      
+                  output = main.execute(String.valueOf(i));
+      
+                  String compare = null;
+                  for (var set : currency) {
+                      if (output.split("\n")[0].contains(set)) {
+                          compare = parseExchangeRate(getCurrency, set);
+                          break;
+                      }
+                  }
+      
+                  if (compare != null && !compare.toLowerCase().trim().equals(output.split("\n")[0].toLowerCase().trim())) {
+                      throw new WrongAnswer("Your output of this currency does not match the HTTP request from our local server, Your HTTP response: '" + output.split("\n")[0] + "'\n" + "Correct HTTP response: " + compare + "\nAlso, do not forget about the correct apikey, case is important! apiKey -" + apiKey);
+                  }
+                  majorTestingMethod("Would you like to choose another currency? (Y/N)", 3, 3, output);
+                  output = main.execute("y");
+                  majorTestingMethod("1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back", 1, 1, output);
+              }
+      
+              output = main.execute("5");
+              majorTestingMethod("Menu", 2, 1, output);
+              majorTestingMethod("1. Exchange rates, 2. Logout", 2, 2, output);
+      
+              output = main.execute("2");
+              majorTestingMethod("Goodbye", 1, 1, output);
+      
+              if (!main.isFinished()) {
+                  throw new WrongAnswer("Your program should finish");
+              }
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest(repeat = 10)
+      //(feedback = "Testing when correct login")
+          CheckResult test8() {
+              startInit();
+              String output = main.execute("2");
+              majorTestingMethod("Registration", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              output = main.execute(generatePhone(false));
+              majorTestingMethod("Wrong login format, try again", 2, 1, output);
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest(repeat = 10)
+      //(feedback = "Testing output when correct password format")
+          CheckResult test9() {
+              startInit();
+              String output = main.execute("2");
+              majorTestingMethod("Registration", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              output = main.execute(generatePhone(true));
+              majorTestingMethod("Password:", 1, 1, output);
+      
+              output = main.execute(generatePassword(false));
+              majorTestingMethod("Wrong password format, try again", 2, 1, output);
+      
+              return CheckResult.correct();
+          }
+      
+      //(feedback = "Testing output when failed registration")
+      
+          @DynamicTest
+          CheckResult test10() {
+              for (int i = 0; i < 3; i++) {
+                  startInit();
+                  String output = main.execute("1");
+                  majorTestingMethod("Authorization", 2, 1, output);
+                  majorTestingMethod("Login:", 2, 2, output);
+      
+                  output = main.execute(generatePhone(true));
+                  majorTestingMethod("Password:", 1, 1, output);
+                  output = main.execute(generatePassword(true));
+                  majorTestingMethod("The entered password does not match the login or the user does not exist.", 3, 1, output);
+      
+                  majorTestingMethod("Login:", 3, 3, output);
+      
+              }
+              authorize(testingSecondLogin, testingSecondPassword);
+              return CheckResult.correct();
+          }
+      //(feedback = "Testing the output of random greeting phrases against the given parameters")
+      
+          @DynamicTest(repeat = 30)
+          CheckResult test11() {
+      
+              startInit();
+              String output = main.execute("1");
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              authorize(testingFirstLogin, testingFirstPassword);
+      
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test12() {
+              startInit();
+              String output = main.execute("1");
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              output = main.execute(testingFirstLogin);
+              majorTestingMethod("Password:", 1, 1, output);
+              output = main.execute(generatePassword(true));
+              majorTestingMethod("The entered password does not match the login or the user does not exist.", 3, 1, output);
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test13() {
+              startInit();
+              String output = main.execute("1");
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              output = main.execute(testingSecondLogin);
+              majorTestingMethod("Password:", 1, 1, output);
+              for (int i = 0; i < 2; i++) {
+                  output = main.execute(generatePassword(true));
+                  majorTestingMethod("The entered password does not match the login or the user does not exist.", 3, 1, output);
+                  output = main.execute(testingSecondLogin);
+                  majorTestingMethod("Password:", 1, 1, output);
+              }
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          CheckResult test14() {
+              startInit();
+              String output = main.execute("1");
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+              output = main.execute(testingThirdLogin);
+              majorTestingMethod("Password:", 1, 1, output);
+              output = main.execute(generatePassword(true));
+              majorTestingMethod("The entered password does not match the login or the user does not exist.", 3, 1, output);
+              return CheckResult.correct();
+          }
+      
+          //(feedback = "Testing userData file")
+          @DynamicTest
+          CheckResult test15() {
+              fileTesting(testingFirstLogin, testingFirstPassword, 1);
+              return CheckResult.correct();
+          }
+      
+          //(feedback = "Testing userData file")
+          @DynamicTest
+          CheckResult test16() {
+              fileTesting(testingSecondLogin, testingSecondPassword, 2);
+              return CheckResult.correct();
+          }
+      
+          //(feedback = "Testing userData file")
+          @DynamicTest
+          CheckResult test17() {
+              fileTesting(testingThirdLogin, testingThirdPassword, 3);
+              return CheckResult.correct();
+          }
+      
+          private void fileTesting(String login, String password, int accessCount) {
+              startInit();
+              String output = main.execute("1");
+      
+              majorTestingMethod("Authorization", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              List<String> userData;
+              try {
+                  userData = Files.readAllLines(Path.of(FILE.getPath()));
+              } catch (IOException e) {
+                  throw new WrongAnswer("Unable to read userData.txt file or file was not found: " + e.getMessage());
+              }
+      
+              if (userData.size() != 3) {
+                  throw new WrongAnswer("""
+                          The userData.txt file should contain data about three users who were registered during the tests.
+                          Users data must start on a new line.
+                          Example:
+                          Login: +(1) 123 123 3333| Password: H7zhSEcK3ATrndB7gvJmd5Zbqtiwk9lrhcyeHhUEk5Y=| Salt: pTXvgvjebxPh2qLRqIdvoZuX8TxyR3u+ZEoRhFubgG8=| Registration time: 2023-06-01 17:26| Last authorization session: 2023-06-01 17:26| Access: [Unsuccessful access attempt - 2023-08-01 11:26, Unsuccessful access attempt - 2023-08-01 12:26, Unsuccessful access attempt - 2023-08-01 13:26]
+                          Login: 1 342 343 5544| Password: Of9ciui/5d/Tlv94m+cVCx5wdWG1QbRqMldPRNSvnvc=| Salt: DRySPA7xv3oTxBzFDUTgzkuDGVSxlioRizzuxlQ7xXM=| Registration time: 2023-06-01 17:27| Last authorization session: 2023-06-01 17:27| Access: [Unsuccessful access attempt - 2023-01-01 13:26]
+                          Login: +1 123 111 2244| Password: +cJpNBhVw/9nklUJiGl36h6acxPPVN3ceKY8Yqf5HsY=| Salt: YxEDuvdMheUUlhU7vUdA3Omr0S4zUx4Zj85+qlAy9d8=| Registration time: 2023-06-01 17:27| Last authorization session: 2023-06-01 17:27| Access: []
+                          """);
+              }
+      
+              String testingUser = null;
+              String[] line = null;
+              for (var user : userData) {
+                  line = user.split("\\| ");
+                  if (line.length != 6) {
+                      throw new WrongAnswer("The userData.txt The file must contain user data, each of which consists of 6 sections,\n" + " the sections must be separated by this character - '|' Each new user starts on a new line.");
+                  }
+      //          'Login' section testing
+                  if (!line[0].startsWith("Login:")) {
+                      throw new WrongAnswer("The string containing user data must start with 'Login:' but your string output equals - " + line[0]);
+                  }
+                  if (line[0].replaceAll("\\D", "").equals(login.replaceAll("\\D", ""))) {
+                      testingUser = user;
+                      break;
+                  }
+              }
+      
+      //          'Salt and Password' sections testing
+              String savedHashedPassword = line[1].substring(10);
+              byte[] savedSalt = Base64.getDecoder().decode(line[2].substring(6));
+              if (!verifyPassword(password, savedSalt, savedHashedPassword)) {
+                  throw new WrongAnswer("""
+                          The password and salt was not saved in the database, or it was not saved correctly.
+                          Example correct password and salt:
+                          Password: MuIpL4JJbjRpTGdg2oMawHWMEt91AiLxGFgoiw8yjC8=| Salt: Ypt72qwV6/5QXKcmG84WJ/dfnydrlxy1v+ajBBfKE/0=|
+                          Where '|' is a delimiter.""");
+              }
+      
+      //          'Registration time' section testing
+              String[] attempts = getAttempts(line);
+              List<String> access = new ArrayList<>();
+              Collections.addAll(access, attempts);
+              if (access.size() != accessCount) {
+                  throw new WrongAnswer("""
+                                                Data 'Access' section was not saved in the database, or it was not saved correctly.
+                                                Example correct user data save:
+                                                Login: +(1)-944-201-1476| Password: Z/TEmztuN3P1BxeAD/SzP5N7zTXDK0x0dJe5dckgBks=| Salt: ccWkx8kddf935lXn9GtZ4CktR12XfdDJUX0WQkSGZ2M=| Registration time: 2023-08-27 18:15| Last authorization session: 2023-08-27 18:15| Access: [Unsuccessful access attempt - 2023-08-27 18:15]
+                                                Your string -\s
+                                                """ + testingUser);
+              }
+      
+              if (testingUser == null) {
+                  throw new WrongAnswer("The user being tested does not exist in the database,but was registered during the tests." + " Login: " + login);
+              }
+              authorize(login, password);
+          }
+      
+          private static String[] getAttempts(String[] line) {
+              String registrationTimeSection = line[3].substring(19);
+              String timeRegex = "\\d{1,4}[/\\\\\\s:\\-]\\d{1,2}[/\\\\\\s:\\-]\\d{1,4} \\d{1,2}[\\s:\\-]\\d{1,2}([\\s:\\-]\\d{1,2})?$";
+              if (!registrationTimeSection.matches(timeRegex)) {
+                  throw new WrongAnswer("The Registration time section was not saved in the database, or it was not saved correctly.");
+              }
+      
+      //          'Last authorization session' section testing
+              if (!line[4].substring(28).matches(timeRegex)) {
+                  throw new WrongAnswer("The 'Last authorization session' section was not saved in the database, or it was not saved correctly.");
+              }
+      
+      //          'Access' section testing
+              String accessLine = line[5].substring(8);
+              return accessLine.substring(1, accessLine.length() - 1).split(", ");
+          }
+      
+          private void startInit() {
+              main = new TestedProgram();
+              var getInput = main.start().trim().split("\\n");
+      
+              if (getInput.length != 2) {
+                  throw new WrongAnswer("Your program should print " + 2 + " lines but it printed " + getInput.length + " line(s).");
+              }
+              if (!Pattern.matches("^would you like to login or register[?!.:]?$", getInput[0].toLowerCase())) {
+                  throw new WrongAnswer("Your program should print " + "Would you like to login or register?" + " lines but it printed '" + getInput[0] + "' string.");
+              }
+              if (!Pattern.matches("^1\\.? login, 2\\.? register[?.:]?\\s?$", getInput[1].toLowerCase())) {
+                  throw new WrongAnswer("Your program should print " + "1. Login, 2. Register:" + " lines but it printed " + getInput[1] + " string.");
+              }
+          }
+      
+          private void authorize(String login, String password) {
+              String output = main.execute(login);
+              majorTestingMethod("Password:", 1, 1, output);
+      
+              output = main.execute(password);
+              majorTestingMethod("Authorization successful.", 5, 1, output);
+      
+              if (output.split("\n")[2].length() > 60) {
+                  throw new WrongAnswer("Your creativity '" + output.split("\n")[2].length() + "' - exceeds the 60 character limit, try shortening the message a bit");
+              }
+              majorTestingMethod("Menu", 5, 4, output);
+              majorTestingMethod("1. Exchange rates, 2. Logout", 5, 5, output);
+              output = main.execute("2");
+              majorTestingMethod("Goodbye", 1, 1, output);
+      
+              if (!main.isFinished()) {
+                  throw new WrongAnswer("Your program should finish");
+              }
+          }
+      
+          private void initNewPerson(String login, String password) {
+      //      for line equal to Password
+              String output = main.execute("2");
+              majorTestingMethod("Registration", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      
+              output = main.execute(login);
+              majorTestingMethod("Password:", 1, 1, output);
+      //      for line equal to "reg again and log in"
+              output = main.execute(password);
+              majorTestingMethod("Enter the data again to complete the registration.", 2, 1, output);
+              majorTestingMethod("Login:", 2, 2, output);
+      //      for line equal to Password
+              output = main.execute(login);
+              majorTestingMethod("Password:", 1, 1, output);
+      //      for line equal congratulations, now you can and log in
+              output = main.execute(password);
+              majorTestingMethod("Congratulations on your successful registration!", 5, 1, output);
+              majorTestingMethod("Now you can log in!", 5, 2, output);
+      
+              majorTestingMethod("Authorization", 5, 4, output);
+              majorTestingMethod("Login:", 5, 5, output);
+              authorize(login, password);
+          }
+      
+          private void majorTestingMethod(String correctOutput, int correctNumberOfLines, int testableOutputTextOnLineNumbered, String output) {
+              String looseTestes = "[!.]?$";
+              String looseTestes2 = "(don['`]?t)|(doesn['`]?t)";
+              String orRegex = "['\"()]?";
+              String yOrN = "\\s?['\"(]y[,.\\s/]?n['\")][!.:]?$";
+              var outputLines = expect(output).toContain(correctNumberOfLines).lines();
+      
+              String[] executeText = outputLines.toArray(new String[0]);
+      
+              String check = executeText[testableOutputTextOnLineNumbered - 1].trim();// If outputLines does not match the expected number of lines, the test will not reach [outputTextInLineNumber - 1], now it's safe.
+      
+              String[] regexes = {"^enter[a-z\\s]+?again[a-z\\s]+?complete[a-z\\s]+?registrations?" + looseTestes //0
+                      , "^passwords? " + looseTestes2 + " match" + looseTestes //1
+                      , "^logins? " + looseTestes2 + " match" + looseTestes //2
+                      , "^logins? and passwords? " + looseTestes2 + " match" + looseTestes,   //3
+                      "^congratulations? on your? successful registrations?" + looseTestes, //4
+                      "^login:$", //5
+                      "^password:$", //6
+      
+                      "^authorization successful" + looseTestes, //7
+                      "^authorization failed" + looseTestes, //8
+                      "^wrong login format,? try again" + looseTestes, //9
+                      "^wrong password format,? try again" + looseTestes, //10
+                      "^login is already taken,? try (another login)?(again)?" + looseTestes, //11
+                      "^now you can log\\s?in" + looseTestes, //12
+                      "^registration\\.?$", //13
+      
+                      "^would you like to login or register[?!.:]?$", //14
+                      "^1\\.? login, 2\\.? register[?.:]?$", //15
+                      "^invalid input, try again ['\"()]?1 or 2['\"()]?[?!.:]?$", //16
+                      "^goodbye" + looseTestes, //17
+                      "^invalid choice\\.?,? please enter a valid option number " + orRegex + "1" + orRegex + " or " + orRegex + "2" + orRegex + "\\.?:?$", //18
+                      "^the entered password does not match the login or the user does not exist" + looseTestes, //19
+                      "^authorization" + looseTestes, //20
+      
+                      "^menu" + looseTestes, //21
+                      "^1[.]?\\s?exchange rates?,? 2[.]?\\s?logout[?.:]?$",  //22
+                      "^exchange rates[:.]?$", "^1[.]? EUR, 2[.]? GBP, 3[.]? UAH, 4[.]? CNY, 5[.]? Back[?.:]?$", "^\\(1\\. EUR, 2\\. GBP, 3\\. UAH, 4\\. CNY\\.?,? or 5\\. Back\\):?\\.?!?$", //23
+                      "^incorrect currency code,? try again" + looseTestes, //24
+                      "^would you like to choose another currency\\?" + yOrN, //25
+                      "^invalid input[!.,]" + yOrN //26
+              };
+              for (String regex : regexes) {
+                  var pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+                  if (pattern.matcher(correctOutput).find()) {
+                      if (pattern.matcher(check).find()) {
+                          return;
+                      }
+                  }
+              }
+              throw new WrongAnswer("Your program should print '" + correctOutput + "' but it printed '" + check + "'");
+          }
+      
+          private final Object[] forAnyCase = {"!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", "+", "[", "]", "{", "}", "|", "\\", ";", ":", "'", "\"", ",", ".", "<", ">", "/", "?", "`", "~", " ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+      
+          private String generatePassword(boolean isCheck) {
+              Random random = new Random();
+              StringBuilder passwordBuilder = new StringBuilder();
+              int length = randomize(19) + 7;
+              String output;
+              while (true) {
+                  for (int i = 0; i < length; i++) {
+                      var forLoginNReg = forAnyCase[random.nextInt(forAnyCase.length)];
+                      passwordBuilder.append(forLoginNReg);
+                  }
+                  output = passwordBuilder.toString();
+                  if (isCheck) {
+                      if (validatePassword(output)) {
+                          break;
+                      }
+                  } else {
+                      if (!validatePassword(output)) {
+                          break;
+                      }
+                  }
+                  passwordBuilder.setLength(0);
+              }
+              return output;
+          }
+      
+          private String generatePhone(boolean isCheck) {
+              String login = "";
+              while (true) {
+                  if (isCheck) {
+      
+                      int rand = randomize(3);
+                      switch (rand) {
+                          case 0 ->
+                                  login = String.format("+(1)-%s-%s-%s", generateRandomDigits(3), generateRandomDigits(3), generateRandomDigits(4));
+                          case 1 ->
+                                  login = String.format("(1) %s %s %s", generateRandomDigits(3), generateRandomDigits(3), generateRandomDigits(4));
+                          case 2 ->
+                                  login = String.format("1%s%s%s", generateRandomDigits(3), generateRandomDigits(3), generateRandomDigits(4));
+                          default -> {
+                          }
+                      }
+                      if (validatePhone(login)) {
+                          break;
+                      }
+                  } else {
+                      login = String.format("+(%s)-%s-%s-%s", generateRandomAnyCase(2), generateRandomAnyCase(3), generateRandomAnyCase(3), generateRandomAnyCase(4));
+                      if (!validatePhone(login)) {
+                          break;
+                      }
+      
+                  }
+      
+              }
+              return login;
+          }
+      
+          private String generateRandomDigits(int length) {
+              StringBuilder sb = new StringBuilder();
+              for (int i = 0; i < length; i++) {
+                  sb.append(randomize(10));
+              }
+              return sb.toString();
+          }
+      
+          private String generateRandomAnyCase(int length) {
+              StringBuilder sb = new StringBuilder();
+              for (int i = 0; i < length; i++) {
+                  sb.append(forAnyCase[randomize(forAnyCase.length)]);
+              }
+              return sb.toString();
+          }
+      
+          private boolean validatePhone(String phoneNumber) {
+              // Checking all requirements
+              Pattern pattern = Pattern.compile("^\\+?\\(?1\\)?[-\\s]?\\d{3}[-\\s]?\\d{3}[-\\s]?\\d{4}$");
+              boolean isMatch = pattern.matcher(phoneNumber).matches();
+              // Checking the length
+              phoneNumber = phoneNumber.replaceAll("\\D", "");
+              boolean lengthCase = phoneNumber.length() == 11;
+              // result
+              return isMatch && lengthCase;
+          }
+      
+          private boolean validatePassword(String password) {
+              return password.length() >= 6 && password.length() <= 28 // Valid password length
+                     && password.replaceAll("[a-zA-Z\\d!@#$%\\s]", "").isEmpty() // Valid characters
+                     && password.matches(".*[A-Z].*") // At least one capital letter
+                     && password.matches(".*[a-z].*") // At least one lowercase letter
+                     && password.matches(".*\\d.*") // At least one digit
+                     && !password.matches("^\\s.*|^.*\\s$"); // Space start or end
+          }
+      
+          private boolean verifyPassword(String password, byte[] salt, String hashedPassword) {
+              byte[] enteredPasswordHash = hashPassword(password, salt);
+              // Decode stored hashed password from Base64 format
+              byte[] savedPasswordHash = Base64.getDecoder().decode(hashedPassword);
+              return MessageDigest.isEqual(savedPasswordHash, enteredPasswordHash);
+          }
+      
+          private byte[] hashPassword(String password, byte[] salt) {
+              char[] passwordChars = password.toCharArray();
+      
+              int KEY_LENGTH = 256;
+              int ITERATIONS = 10000;
+              PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, ITERATIONS, KEY_LENGTH);
+      
+              SecretKeyFactory keyFactory;
+              try {
+                  keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+                  return keyFactory.generateSecret(spec).getEncoded();
+              } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                  throw new WrongAnswer("""
+                          Error initializing the class - SecretKeyFactory
+                          The class is initialized as follows: SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+                          Check the method: hashPassword(), строка: 475
+                          """);
+              }
+          }
+      
+          protected final String apiKey = "ASDcvv14Dfvv67539a551345n2l34kjklhv012";
+      
+          private String parseExchangeRate(String responseBody, String currency) {
+              String[] exchangeRate = responseBody.split("\"}");
+              String res = null;
+              for (var rate : exchangeRate) {
+                  if (rate.contains(currency)) {
+                      res = rate.replaceAll("[^\\d.]", "");
+                      break;
+                  }
+              }
+              return "Currency exchange: USD to " + currency + " exchange rate: " + res;
+          }
+      
+          private String initLocalServer() {
+              StringBuilder response = new StringBuilder();
+              HttpURLConnection connection = null;
+              int responseCode;
+              try {
+                  connection = getHttpURLConnection();
+                  connection.setConnectTimeout(5000);
+                  connection.connect();
+                  responseCode = connection.getResponseCode();
+      
+                  if (responseCode == HttpURLConnection.HTTP_OK) {
+                      try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                          String line;
+                          while ((line = reader.readLine()) != null) {
+                              response.append(line);
+                          }
+                      } catch (IOException e) {
+                          throw new RuntimeException(e);
+                      }
+                  }
+              } catch (IOException e) {
+                  throw new RuntimeException(e);
+              } finally {
+                  if (connection != null) {
+                      connection.disconnect();
+                  }
+              }
+              return response.toString();
+          }
+      
+          private HttpURLConnection getHttpURLConnection() {
+              URL url;
+              try {
+                  url = new URL("http://localhost:8080/hyperskill-exchange/api/latest.json?app_id=" + apiKey);
+              } catch (MalformedURLException e) {
+                  throw new RuntimeException(e);
+              }
+              HttpURLConnection connection;
+              try {
+                  connection = (HttpURLConnection) url.openConnection();
+              } catch (IOException e) {
+                  throw new RuntimeException(e);
+              }
+              try {
+                  connection.setRequestMethod("GET");
+              } catch (ProtocolException e) {
+                  throw new RuntimeException(e);
+              }
+              return connection;
+          }
+      
+          private int randomize(int i) {
+              return new Random().nextInt(i);
+          }
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/projects/386/stages/2298/implement#comment
+status: Unchecked
+record: -1

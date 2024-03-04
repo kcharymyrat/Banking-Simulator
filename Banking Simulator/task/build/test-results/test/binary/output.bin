@@ -1,0 +1,170 @@
+[1;31m
+Start test 1[0m
+Username:
+> Alex
+Password:
+> GreatAlexander2001
+
+3Enter the data again to complete the registration
+Username:
+> Alex
+Password:
+> GreatAlexander2001
+
+2Congratulations on your successful registration!
+[1;31m
+Start test 2[0m
+Username:
+> Jack
+Password:
+> Jack$master$
+
+3Enter the data again to complete the registration
+Username:
+> Jack
+Password:
+> Jack$master
+Passwords don't match.
+[1;31m
+Start test 3[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack50
+Password:
+> 25BadJack
+$Username and password don't match.
+[1;31m
+Start test 4[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack29
+Password:
+> 15BadJack
+$Username and password don't match.
+[1;31m
+Start test 5[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack54
+Password:
+> 3BadJack
+$Username and password don't match.
+[1;31m
+Start test 6[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack67
+Password:
+> 65BadJack
+$Username and password don't match.
+[1;31m
+Start test 7[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack27
+Password:
+> 62BadJack
+$Username and password don't match.
+[1;31m
+Start test 8[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack39
+Password:
+> 88BadJack
+$Username and password don't match.
+[1;31m
+Start test 9[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack35
+Password:
+> 19BadJack
+$Username and password don't match.
+[1;31m
+Start test 10[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+> Jack8
+Password:
+> 86BadJack
+$Username and password don't match.
+[1;31m
+Start test 11[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack12
+Password:
+> 22BadJack
+$Username and password don't match.
+[1;31m
+Start test 12[0m
+Username:
+> Jack
+Password:
+> Jack
+
+3Enter the data again to complete the registration
+Username:
+	> Jack47
+Password:
+> 21BadJack
+$Username and password don't match.
+[1;31m
+Start test 13[0m
+Username:
+> Andy
+Password:
+> Andy$master$
+
+3Enter the data again to complete the registration
+Username:
+	> Andy72
+Password:
+> Andy$master$
+Username doesn't match.

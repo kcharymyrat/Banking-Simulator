@@ -1,0 +1,256 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>Great job on your work so far! However, there's one important thing left to include: getting the latest currency exchange rates to the US dollar. To achieve this, you'll need to create a method that sends a request to retrieve these rates. This method will be based on the <code class="java">GET</code> request to the API.</p>
+<p>We've compiled a guide for you based on the current <em>openexchangerates</em> website. This website offers a free API key, but keep in mind that there are limits on the number of requests you can make. Before we move forward, let's walk through an example on this platform, which will be sufficient for practical purposes. Once our stage is implemented, you can test it by sending a GET request to the API and receiving a response in JSON format.</p>
+<p>You'll receive an API key that you'll need to use throughout the project:</p>
+<p><code class="java">ASDcvv14Dfvv67539a551345n2l34kjklhv012</code></p>
+<p>After completing this stage, if you want to practice or try out your ideas, you can use any platform you prefer. If you decide to use the platform from our example, this short step-by-step guide will assist you:</p>
+<ol>
+<li>Sign up for a free account on the Open Exchange Rates website.</li>
+<li>Upon registration, you'll be given an API key. You can use this key to practice making API requests.</li>
+<li>Use the following link to send a GET request to the openexchangerates platform: <code class="java">https://openexchangerates.org/api/latest.json?app_id=apiKey</code>. Replace <code class="java">apiKey</code> with your actual API key.</li>
+<li>For more detailed instructions, visit the <a href="https://docs.openexchangerates.org/reference/api-introduction" rel="noopener noreferrer nofollow" style="color: black;" target="_blank">openexchangerates website</a>.</li>
+</ol>
+<p>We want to emphasize that we're not trying to impose any limitations on you. Our goal is to ensure the security of your API keys.</p>
+<p>This step will introduce us to the world of API interactions, elevating our application to a whole new level. Keep up the great work!</p>
+<h5 id="objectives">Objectives</h5>
+<p>Let's update the look of our menu by adding a new section: <code class="language-no-highlight">Exchange rates</code></p>
+<p>Now our menu looks like this:</p>
+<pre><code class="language-no-highlight">Menu 1. Exchange rates, 2. Logout</code></pre>
+<p>When the user selects this option from the menu, it should get a list of currencies. The section of requests for the following currencies might look like this:</p>
+<pre><code class="java">Exchange rates 1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back</code></pre>
+<p>The output now accompanies the wrong selection in the main menu:</p>
+<pre><code class="language-no-highlight">Invalid choice. Please enter a valid option number '1' or '2':</code></pre>
+<p>Getting the exchange rates</p>
+<p>To realize all our plans, you need these guys:</p>
+<ol>
+<li>Building a client and sending a request to the server starts with the <code class="java"><a href="https://docs.oracle.com/en/java/javase/20/docs/api/java.net.http/java/net/http/HttpClient.html" rel="noopener noreferrer nofollow" style="color: black;" target="_blank">HttpClient</a></code> abstract class.</li>
+<li>For the creation of a GET request: The <code class="java"><a href="https://docs.oracle.com/en/java/javase/20/docs/api/java.net.http/java/net/http/HttpRequest.html" rel="noopener noreferrer nofollow" style="color: black;" target="_blank">HttpRequest</a></code> abstract class.</li>
+<li>The one who will always respond to all questions is represented as the <code class="java"><a href="https://docs.oracle.com/en/java/javase/20/docs/api/java.net.http/java/net/http/HttpResponse.html" rel="noopener noreferrer nofollow" style="color: black;" target="_blank">HttpResponse</a></code> interface class.</li>
+<li>The last of the four that will consistently deliver the body — the <code class="java"><a href="https://docs.oracle.com/en/java/javase/20/docs/api/java.net.http/java/net/http/BodyHandlers.html" rel="noopener noreferrer nofollow" style="color: black;" target="_blank">BodyHandlers</a></code> class, in our case, in the JSON format.</li>
+</ol>
+<p>This is a complete of what your link might look like:</p>
+<pre><code class="language-no-highlight">http://localhost:8080/hyperskill-exchange/api/latest.json?app_id=ASDcvv14Dfvv67539a551345n2l34kjklhv012"</code></pre>
+<p>The following are examples of using the predefined body handlers to convert a flow of response body data into common high-level Java objects:</p>
+<pre><code class="language-no-highlight">
+// Receives the response body as a String
+HttpResponse&lt;String&gt; response = client.send(request, BodyHandlers.ofString());
+
+// Receives the response body as a file
+HttpResponse&lt;Path&gt; response = client.send(request, BodyHandlers.ofFile(Paths.get("example.html")));
+
+// Receives the response body as an InputStream
+HttpResponse&lt;InputStream&gt; response = client.send(request, BodyHandlers.ofInputStream());
+
+// Discards the response body
+HttpResponse&lt;Void&gt; response = client.send(request, BodyHandlers.discarding());
+
+// This is an example code that sends an empty request
+
+// Creating a new HttpClient object using default settings
+HttpClient client = HttpClient.newBuilder().build();
+
+// Creating a new HttpRequest object using default settings
+HttpRequest emptyRequest = HttpRequest.newBuilder()
+
+// Setting the URI (Uniform Resource Identifier) for the HTTP request
+using .uri() method
+    .uri(URI.create(getRedirectUri()))
+
+// Setting the timeout for the HTTP request (500 milliseconds)
+using .timeout() method
+        .timeout(Duration.ofMillis(500))
+
+// Setting the HTTP method of the request to GET using .GET() method
+// (GET request is used for retrieving data from the server)
+            .GET()
+
+// Completing the construction of the HttpRequest object and obtaining the
+ready-to-use request using .build() method
+            .build();
+</code></pre>
+<p>All this will help you to implement a method to parse the response body and get the exchange rates.</p>
+<ul>
+<li>Data parsing</li>
+</ul>
+<p>How do you get a response to a request in the form of JSON? After reviewing the information above, send a <code class="java">GET</code> request using the <code class="java">HttpClient</code>, and the server will return a response with exchange rate data in JSON format.</p>
+<ul>
+<li>Reading a JSON string:</li>
+</ul>
+<pre><code class="language-no-highlight">client.send(emptyRequest, HttpResponse.BodyHandlers.ofString()).body()</code></pre>
+<p>The received response from the server is represented as a string. <code class="java">Client</code> is the <code class="java">HttpClient</code> class object.</p>
+<ul>
+<li>Data Extraction:</li>
+</ul>
+<p>Once the JSON object has been created, you can extract the exchange rate values using the keys.</p>
+<p>Each exchange rate is represented as a key/value pair, where the key is the currency code (for example, EUR), and the value is the rate value. In our implementation, we will query the USD exchange rate concerning the base currency: <code class="java">1. EUR, 2. GBP, 3. UAH, 4. CNY</code>.</p>
+<pre><code class="language-no-highlight">
+
+// The responseString is expected to be a JSON response string from the server.
+String responseString = ...; /*Your JSON response will be here*/{
+      "rates": {
+        "USD": 0.970
+      },
+      "base": "EUR"
+    }
+    {
+      "rates": {
+        "USD": 7.191
+      },
+      "base": "BGP"
+    }
+    {
+      "rates": {
+        "USD": 36.790
+      },
+      "base": "UAH"
+    }
+    {
+      "rates": {
+        "USD": 7.111
+      },
+      "base": "CNY"
+    }</code></pre>
+<p>An example code for parsing JSON data might look like this:</p>
+<pre><code class="language-no-highlight">
+try {
+// Implementing the parsing method
+String parseExchangeRate(String responseBody, String currency) {
+// Getting of the required currency, using a call to the data parsing method
+// Your code will be here...}
+
+// You can display the exchange rate in the console, for example, in this way
+System.out.println("Currency exchange: " + parseExchangeRate(responseString, "EUR"));
+
+// Handling an exception if a JSON parsing error occurs
+} catch (Exception e) {
+...
+}</code></pre>
+<p>Final implementation after receiving the data and processing it.</p>
+<ul>
+<li>When the user requests an exchange rate, you need to print the following message to the console:</li>
+</ul>
+<pre><code class="language-no-highlight">USD to XXX exchange rate: 0.000</code></pre>
+<p><code class="java">XXX</code> represents the abbreviated currency name, and <code class="java">0.000</code> represents the USD to the <code class="java">XXX</code> exchange rate.</p>
+<ul>
+<li>In code, the version of this line might look like this:</li>
+</ul>
+<pre><code class="language-no-highlight">Currency exchange: USD to BGP exchange rate: 7.191</code></pre>
+<ul>
+<li>If the user enters an incorrect currency code, display the message:</li>
+</ul>
+<pre><code class="language-no-highlight">Incorrect currency code, try again. (1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):</code></pre>
+<ul>
+<li>After providing the exchange rate, the program should ask the user:</li>
+</ul>
+<pre><code class="language-no-highlight">Would you like to choose another currency? (Y/N)</code></pre>
+<ul>
+<li>If the user enters <code class="java">Y</code>, display the available currencies:</li>
+</ul>
+<pre><code class="language-no-highlight">1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back</code></pre>
+<ul>
+<li>If the user enters <code class="java">N</code>, return to the main menu. If the user entered other data in this section, display the message:</li>
+</ul>
+<pre><code class="language-no-highlight">Invalid input! (Y/N):</code></pre>
+<p>In addition to delimiting the greeting with an empty string, each new request must be delimited by sending an empty message.</p>
+<p> </p>
+<p>For testing purposes, create a file in the main project folder called <em>userData.txt; your</em> database must store and read data from the specified file.</p>
+<h5 id="examples">Examples</h5>
+<p>The greater-than symbol followed by a space (<code class="java">&gt; </code>) represents the user input. Note that it's not part of the input.</p>
+<p><strong>Example 1:</strong></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt; 1
+
+Authorization
+Login: &gt; (1) 988 092 5566
+Password: &gt; Bc4i8W0hh
+Authorization successful
+
+We've been waiting for you!
+Menu
+1. Exchange Rate, 2. Logout
+&gt; 1
+
+Exchange rates
+1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+&gt; $
+
+Incorrect currency code, try again.
+(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):&gt; t
+
+Incorrect currency code, try again.
+(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):&gt; 2
+Currency exchange: USD to GBP exchange rate: 0.786
+
+Would you like to choose another currency? (Y/N)
+&gt; X
+Invalid input! (Y/N):
+&gt; r
+Invalid input! (Y/N):
+&gt; 3
+
+1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+&gt; 5
+
+Menu
+1. Exchange Rate, 2. Logout
+&gt; N
+Invalid choice. Please enter a valid option number '1' or '2':
+&gt; 2
+Goodbye
+</code></pre>
+<p><strong>Example 2:</strong></p>
+<pre><code class="language-no-highlight">
+Would you like to login or register?
+1. Login, 2. Register: &gt; 1
+
+Authorization
+Login: &gt; (1) 988 092 5566
+Password: &gt; Bc4i8W0hh
+Authorization successful
+
+We've been waiting for you!
+Menu
+1. Exchange Rate, 2. Logout
+&gt; 1
+
+Exchange rates
+1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+&gt; d
+
+Incorrect currency code, try again.
+(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):&gt; ;
+
+Incorrect currency code, try again.
+(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):&gt; $
+
+Incorrect currency code, try again.
+(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):&gt; 2
+Currency exchange: USD to GBP exchange rate: 0.786
+
+Would you like to choose another currency? (Y/N)
+&gt; k
+Invalid input! (Y/N):
+&gt; s
+Invalid input! (Y/N):
+&gt; D
+Invalid input! (Y/N):
+&gt;
+Invalid input! (Y/N):
+&gt; t
+Invalid input! (Y/N):
+&gt; y
+
+1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+&gt; 5
+
+Menu
+1. Exchange Rate, 2. Logout
+&gt; k
+Invalid choice. Please enter a valid option number '1' or '2':
+&gt; 2
+Goodbye
+
+</code></pre>
+</div>
