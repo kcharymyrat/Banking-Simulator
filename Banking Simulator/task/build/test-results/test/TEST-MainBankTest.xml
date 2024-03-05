@@ -1,177 +1,922 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="MainBankTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-03-03T13:00:08" hostname="WIN-PK97IO7J39D" time="0.738">
+<testsuite name="MainBankTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-03-05T11:47:37" hostname="WIN-PK97IO7J39D" time="1.64">
   <properties/>
-  <testcase name="start" classname="MainBankTest" time="0.738"/>
+  <testcase name="start" classname="MainBankTest" time="1.64"/>
   <system-out><![CDATA[?[1;31m
 Start test 1?[0m
-Username:
-> Alex
+Registration
+Login:
+> (1) 366 080 5062
 Password:
-> GreatAlexander2001
+> jMkB0INQPqnkL
 
 Enter the data again to complete the registration
-Username:
-> Alex
+Login:
+> (1) 366 080 5062
 Password:
-> GreatAlexander2001
+> jMkB0INQPqnkL
 
+Now you can log in for finishing the registration.
+Login:
+> (1) 366 080 5062
+Password:
+> jMkB0INQPqnkL
+Authorization successful
 Congratulations on your successful registration!
 ?[1;31m
 Start test 2?[0m
-Username:
-> Jack
+Registration
+Login:
+> +(1)-090-716-7043
 Password:
-> Jack$master$
+> xLNsG38gNuw6!xDOvz
 
 Enter the data again to complete the registration
-Username:
-> Jack
+Login:
+> +(1)-090-716-7043
 Password:
-> Jack$master
-Passwords don't match.
+> xLNsG38gNuw6!xDOvz
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-090-716-7043
+Password:
+> LNsG38gNuw6!xDOvz
+Authorization failed
 ?[1;31m
 Start test 3?[0m
-Username:
-> Jack
+Registration
+Login:
+> (1) 525 694 0666
 Password:
-> Jack
+> shwfwf1SdyZv@TrcuXZLfJx
 
 Enter the data again to complete the registration
-Username:
-> Jack50
+Login:
+> 12222624362
 Password:
-> 25BadJack
-Username and password don't match.
+> hwfwf1SdyZv@TrcuXZLfJx
+
+Login and password don't match.
+Login:
+> 12222624362
+Password:
+> shwfwf1SdyZv@TrcuXZLfJx
+
+Login doesn't match.
+Login:
+> (1) 525 694 0666
+Password:
+> MEGAPASSSSSSSSSSSSSWORD
+
+Passwords don't match
+Login:
+> (1) 525 694 0666
+Password:
+> shwfwf1SdyZv@TrcuXZLfJx
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 525 694 0666
+Password:
+> shwfwf1SdyZv@TrcuXZLfJx
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 4?[0m
-Username:
-> Jack
-Password:
-> Jack
-
-Enter the data again to complete the registration
-Username:
-> Jack29
-Password:
-> 15BadJack
-Username and password don't match.
+Registration
+Login:
 ?[1;31m
 Start test 5?[0m
-Username:
-> Jack
+Registration
+Login:
+> (1) 956 374 1723
 Password:
-> Jack
+> 3U@g#&-$B"Fakw~Hq)i`
+Wrong password format, try again
+Password:
+> 0toKqn6eQKF6QSaE#8
 
 Enter the data again to complete the registration
-Username:
-> Jack54
+Login:
+> (1) 956 374 1723
 Password:
-> 3BadJack
-Username and password don't match.
+> 0toKqn6eQKF6QSaE#8
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 956 374 1723
+Password:
+> 0toKqn6eQKF6QSaE#8
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 6?[0m
-Username:
-> Jack
+Registration
+Login:
+> (1) 199 010 5908
 Password:
-> Jack
+> iQ~2iViObGCRt)o>0/GT2@kA
+Wrong password format, try again
+Password:
+> hDc7lna5yes
 
 Enter the data again to complete the registration
-Username:
-> Jack67
+Login:
+> (1) 199 010 5908
 Password:
-> 65BadJack
-Username and password don't match.
+> hDc7lna5yes
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 199 010 5908
+Password:
+> hDc7lna5yes
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 7?[0m
-Username:
-> Jack
+Registration
+Login:
+> (1) 289 689 2790
 Password:
-> Jack
+> _6YS_j6Q|#3)8~ZH
+Wrong password format, try again
+Password:
+> KNMtmv!LsLi3SJLDo9EW!B O
 
 Enter the data again to complete the registration
-Username:
-> Jack27
+Login:
+> (1) 289 689 2790
 Password:
-> 62BadJack
-Username and password don't match.
+> KNMtmv!LsLi3SJLDo9EW!B O
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 289 689 2790
+Password:
+> KNMtmv!LsLi3SJLDo9EW!B O
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 8?[0m
-Username:
-> Jack
+Registration
+Login:
+> (1) 604 633 3616
 Password:
-> Jack
+> *.8k3-t.RC3;7P^`{O,J%|
+Wrong password format, try again
+Password:
+> ftwL1mxtbk!WXOUc
 
 Enter the data again to complete the registration
-Username:
-> Jack39
+Login:
+> (1) 604 633 3616
 Password:
-> 88BadJack
-Username and password don't match.
+> ftwL1mxtbk!WXOUc
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 604 633 3616
+Password:
+> ftwL1mxtbk!WXOUc
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 9?[0m
-Username:
-> Jack
+Registration
+Login:
+> +(1)-143-858-5428
 Password:
-> Jack
+> %+dbGJV%Pq7MlF P9/Ex
+Wrong password format, try again
+Password:
+> ZDGnkTPx8Ik0SNDW@Wx
 
 Enter the data again to complete the registration
-Username:
-> Jack35
+Login:
+> +(1)-143-858-5428
 Password:
-> 19BadJack
-Username and password don't match.
+> ZDGnkTPx8Ik0SNDW@Wx
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-143-858-5428
+Password:
+> ZDGnkTPx8Ik0SNDW@Wx
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 10?[0m
-Username:
-> Jack
+Registration
+Login:
+> +(1)-621-193-8415
 Password:
-> Jack
+> [{Ws?}!*b]'`t
+Wrong password format, try again
+Password:
+> Z57!3TeD
 
 Enter the data again to complete the registration
-Username:
-> Jack8
+Login:
+> +(1)-621-193-8415
 Password:
-> 86BadJack
-Username and password don't match.
+> Z57!3TeD
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-621-193-8415
+Password:
+> Z57!3TeD
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 11?[0m
-Username:
-> Jack
+Registration
+Login:
+> +(1)-845-145-1328
 Password:
-> Jack
+> 7BcV&MQ
+Wrong password format, try again
+Password:
+> arkNsiQU75g
 
 Enter the data again to complete the registration
-Username:
-> Jack12
+Login:
+> +(1)-845-145-1328
 Password:
-> 22BadJack
-Username and password don't match.
+> arkNsiQU75g
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-845-145-1328
+Password:
+> arkNsiQU75g
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 12?[0m
-Username:
-> Jack
+Registration
+Login:
+> 19933179079
 Password:
-> Jack
+> R}hy'I>[e39g]gzi-&Dr[Bgtu
+Wrong password format, try again
+Password:
+> LJ5QUa#VjwTL OHn
 
 Enter the data again to complete the registration
-Username:
-> Jack47
+Login:
+> 19933179079
 Password:
-> 21BadJack
-Username and password don't match.
+> LJ5QUa#VjwTL OHn
+
+Now you can log in for finishing the registration.
+Login:
+> 19933179079
+Password:
+> LJ5QUa#VjwTL OHn
+Authorization successful
+Congratulations on your successful registration!
 ?[1;31m
 Start test 13?[0m
-Username:
-> Andy
+Registration
+Login:
+> +(1)-595-054-7264
 Password:
-> Andy$master$
+> 3unb.:RNy~p&p
+Wrong password format, try again
+Password:
+> #UbuQ6TfXn@%C7X5 M%tL%M
 
 Enter the data again to complete the registration
-Username:
-> Andy72
+Login:
+> +(1)-595-054-7264
 Password:
-> Andy$master$
-Username doesn't match.
+> #UbuQ6TfXn@%C7X5 M%tL%M
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-595-054-7264
+Password:
+> #UbuQ6TfXn@%C7X5 M%tL%M
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 14?[0m
+Registration
+Login:
+> (1) 349 910 8606
+Password:
+> 7~(?fp`y0KW)GD$h~
+Wrong password format, try again
+Password:
+> y6QfXBYEgi
+
+Enter the data again to complete the registration
+Login:
+> (1) 349 910 8606
+Password:
+> y6QfXBYEgi
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 349 910 8606
+Password:
+> y6QfXBYEgi
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 15?[0m
+Registration
+Login:
+> 10230685369
+Password:
+> #BZN6cyyPV2$YlxY5qC1fz
+
+Enter the data again to complete the registration
+Login:
+> 10230685369
+Password:
+> #BZN6cyyPV2$YlxY5qC1fz
+
+Now you can log in for finishing the registration.
+Login:
+> 10230685369
+Password:
+> #BZN6cyyPV2$YlxY5qC1fz
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 16?[0m
+Registration
+Login:
+> +(1)-683-802-7521
+Password:
+> # yoEzQ7W#SI
+
+Enter the data again to complete the registration
+Login:
+> +(1)-683-802-7521
+Password:
+> # yoEzQ7W#SI
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-683-802-7521
+Password:
+> # yoEzQ7W#SI
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 17?[0m
+Registration
+Login:
+> 13413251805
+Password:
+> J#1WgosV1
+
+Enter the data again to complete the registration
+Login:
+> 13413251805
+Password:
+> J#1WgosV1
+
+Now you can log in for finishing the registration.
+Login:
+> 13413251805
+Password:
+> J#1WgosV1
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 18?[0m
+Registration
+Login:
+> 10554646573
+Password:
+> IijYZU8dRaVW QiMKn!SOKFAS
+
+Enter the data again to complete the registration
+Login:
+> 10554646573
+Password:
+> IijYZU8dRaVW QiMKn!SOKFAS
+
+Now you can log in for finishing the registration.
+Login:
+> 10554646573
+Password:
+> IijYZU8dRaVW QiMKn!SOKFAS
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 19?[0m
+Registration
+Login:
+> (1) 053 241 7273
+Password:
+> c7X!MprP9e
+
+Enter the data again to complete the registration
+Login:
+> (1) 053 241 7273
+Password:
+> c7X!MprP9e
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 053 241 7273
+Password:
+> c7X!MprP9e
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 20?[0m
+Registration
+Login:
+> (1) 918 419 3655
+Password:
+> ZpNZOB%tW7 eP
+
+Enter the data again to complete the registration
+Login:
+> (1) 918 419 3655
+Password:
+> ZpNZOB%tW7 eP
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 918 419 3655
+Password:
+> ZpNZOB%tW7 eP
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 21?[0m
+Registration
+Login:
+> (1) 277 897 7208
+Password:
+> YO$oU%X33mvVzhmvflmk4RmU
+
+Enter the data again to complete the registration
+Login:
+> (1) 277 897 7208
+Password:
+> YO$oU%X33mvVzhmvflmk4RmU
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 277 897 7208
+Password:
+> YO$oU%X33mvVzhmvflmk4RmU
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 22?[0m
+Registration
+Login:
+> 14425734527
+Password:
+> xq20XW! $HB@j6qK%3
+
+Enter the data again to complete the registration
+Login:
+> 14425734527
+Password:
+> xq20XW! $HB@j6qK%3
+
+Now you can log in for finishing the registration.
+Login:
+> 14425734527
+Password:
+> xq20XW! $HB@j6qK%3
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 23?[0m
+Registration
+Login:
+> 11516466873
+Password:
+> M l4mximBSJhPiveuXOf
+
+Enter the data again to complete the registration
+Login:
+> 11516466873
+Password:
+> M l4mximBSJhPiveuXOf
+
+Now you can log in for finishing the registration.
+Login:
+> 11516466873
+Password:
+> M l4mximBSJhPiveuXOf
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 24?[0m
+Registration
+Login:
+> +(1)-701-524-7738
+Password:
+> OE8Ccs e6FIE@#%xqvhnW
+
+Enter the data again to complete the registration
+Login:
+> +(1)-701-524-7738
+Password:
+> OE8Ccs e6FIE@#%xqvhnW
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-701-524-7738
+Password:
+> OE8Ccs e6FIE@#%xqvhnW
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 25?[0m
+Registration
+Login:
+> +(1)-988-791-2710
+Password:
+> F50aNA14@ #Qe@O%y
+
+Enter the data again to complete the registration
+Login:
+> +(1)-988-791-2710
+Password:
+> F50aNA14@ #Qe@O%y
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-988-791-2710
+Password:
+> F50aNA14@ #Qe@O%y
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 26?[0m
+Registration
+Login:
+> +(1)-020-120-3179
+Password:
+> D6goH6ZhFYGUq!mFb
+
+Enter the data again to complete the registration
+Login:
+> +(1)-020-120-3179
+Password:
+> D6goH6ZhFYGUq!mFb
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-020-120-3179
+Password:
+> D6goH6ZhFYGUq!mFb
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 27?[0m
+Registration
+Login:
+> 19880427630
+Password:
+> U5r@ZztvnBkdcEv%Hwp1B!Q
+
+Enter the data again to complete the registration
+Login:
+> 19880427630
+Password:
+> U5r@ZztvnBkdcEv%Hwp1B!Q
+
+Now you can log in for finishing the registration.
+Login:
+> 19880427630
+Password:
+> U5r@ZztvnBkdcEv%Hwp1B!Q
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 28?[0m
+Registration
+Login:
+> (1) 462 578 3812
+Password:
+> @k2eZEa0g
+
+Enter the data again to complete the registration
+Login:
+> (1) 462 578 3812
+Password:
+> @k2eZEa0g
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 462 578 3812
+Password:
+> @k2eZEa0g
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 29?[0m
+Registration
+Login:
+> 10793541637
+Password:
+> b#AVQFi686ysd$ieK0b
+
+Enter the data again to complete the registration
+Login:
+> 10793541637
+Password:
+> b#AVQFi686ysd$ieK0b
+
+Now you can log in for finishing the registration.
+Login:
+> 10793541637
+Password:
+> b#AVQFi686ysd$ieK0b
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 30?[0m
+Registration
+Login:
+> 18194799123
+Password:
+> $nS$2 00
+
+Enter the data again to complete the registration
+Login:
+> 18194799123
+Password:
+> $nS$2 00
+
+Now you can log in for finishing the registration.
+Login:
+> 18194799123
+Password:
+> $nS$2 00
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 31?[0m
+Registration
+Login:
+> +(1)-187-463-9782
+Password:
+> 50!hcgSMXJpJyx
+
+Enter the data again to complete the registration
+Login:
+> +(1)-187-463-9782
+Password:
+> 50!hcgSMXJpJyx
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-187-463-9782
+Password:
+> 50!hcgSMXJpJyx
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 32?[0m
+Registration
+Login:
+> +(T^)-MGI-y=%-hL#W
+Wrong login format, try again
+Login:
+> +(?g)-tG^-P/ -zTrK
+Wrong login format, try again
+Login:
+> +(@c)-\W^-V,2-Jp;y
+Wrong login format, try again
+Login:
+> +(X1)-aGf-s<1-"r-q
+Wrong login format, try again
+Login:
+> (1) 315 299 5640
+Password:
+> u5VpAc1rB0y%wTf6
+
+Enter the data again to complete the registration
+Login:
+> (1) 315 299 5640
+Password:
+> u5VpAc1rB0y%wTf6
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 315 299 5640
+Password:
+> u5VpAc1rB0y%wTf6
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 33?[0m
+Registration
+Login:
+> +(\b)-aO8-4Um-\OEt
+Wrong login format, try again
+Login:
+> +(-P)-l&c-T\S-K6<M
+Wrong login format, try again
+Login:
+> +(1)-690-288-3423
+Password:
+> oOEki6 oiLZQoWqd3uvN
+
+Enter the data again to complete the registration
+Login:
+> +(1)-690-288-3423
+Password:
+> oOEki6 oiLZQoWqd3uvN
+
+Now you can log in for finishing the registration.
+Login:
+> +(1)-690-288-3423
+Password:
+> oOEki6 oiLZQoWqd3uvN
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 34?[0m
+Registration
+Login:
+> +(3d)-f*1-|K/-CiXR
+Wrong login format, try again
+Login:
+> +({E)-eH3-{cw-VG3[
+Wrong login format, try again
+Login:
+> +(Y,)-q\v-%B8-EYi=
+Wrong login format, try again
+Login:
+> +(zS)-p.l-=p!-^NLT
+Wrong login format, try again
+Login:
+> +(H@)-i"n-,R|-6Jkn
+Wrong login format, try again
+Login:
+> 17425025242
+Password:
+> 1XGp0yfsspow$KgmyPRNYhs$h
+
+Enter the data again to complete the registration
+Login:
+> 17425025242
+Password:
+> 1XGp0yfsspow$KgmyPRNYhs$h
+
+Now you can log in for finishing the registration.
+Login:
+> 17425025242
+Password:
+> 1XGp0yfsspow$KgmyPRNYhs$h
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 35?[0m
+Registration
+Login:
+> 14425734527
+Login is already taken, try another login
+Login:
+> (1) 199 010 5908
+Login is already taken, try another login
+Login:
+> (1) 825 192 0545
+Password:
+> bXF37F4
+
+Enter the data again to complete the registration
+Login:
+> (1) 825 192 0545
+Password:
+> bXF37F4
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 462 578 3812
+Password:
+> bXF37F4
+Authorization failed
+?[1;31m
+Start test 36?[0m
+Registration
+Login:
+> +(1)-187-463-9782
+Login is already taken, try another login
+Login:
+> +(1)-020-120-3179
+Login is already taken, try another login
+Login:
+> (1) 403 233 0162
+Password:
+> xBq44NY
+
+Enter the data again to complete the registration
+Login:
+> (1) 403 233 0162
+Password:
+> xBq44NY
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 525 694 0666
+Password:
+> xBq44NY
+Authorization failed
+?[1;31m
+Start test 37?[0m
+Registration
+Login:
+> (1) 366 080 5062
+Login is already taken, try another login
+Login:
+> (1) 395 710 8653
+Password:
+> livxpr73gJE
+
+Enter the data again to complete the registration
+Login:
+> (1) 395 710 8653
+Password:
+> livxpr73gJE
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 315 299 5640
+Password:
+> livxpr73gJE
+Authorization failed
+?[1;31m
+Start test 38?[0m
+Registration
+Login:
+> (1) 447 738 1270
+Password:
+> e1yJ2pWo!d#tU 77I
+
+Enter the data again to complete the registration
+Login:
+> (1) 447 738 1270
+Password:
+> e1yJ2pWo!d#tU 77I
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 447 738 1270
+Password:
+> e1yJ2pWo!d#tU 77I
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 39?[0m
+Registration
+Login:
+> 16647416154
+Password:
+> 9DM8nxCEQ
+
+Enter the data again to complete the registration
+Login:
+> 16647416154
+Password:
+> 9DM8nxCEQ
+
+Now you can log in for finishing the registration.
+Login:
+> 16647416154
+Password:
+> 9DM8nxCEQ
+Authorization successful
+Congratulations on your successful registration!
+?[1;31m
+Start test 40?[0m
+Registration
+Login:
+> (1) 230 227 4632
+Password:
+> VE$RhqRcH0nsAkMurshn4pK%4
+
+Enter the data again to complete the registration
+Login:
+> (1) 230 227 4632
+Password:
+> VE$RhqRcH0nsAkMurshn4pK%4
+
+Now you can log in for finishing the registration.
+Login:
+> (1) 230 227 4632
+Password:
+> VE$RhqRcH0nsAkMurshn4pK%4
+Authorization successful
+Congratulations on your successful registration!
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

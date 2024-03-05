@@ -629,6 +629,12 @@ files:
           }
       }
     learner_created: false
+  - name: userData.txt
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/386/stages/2296/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Tue, 05 Mar 2024 11:47:39 UTC"
 record: -1
