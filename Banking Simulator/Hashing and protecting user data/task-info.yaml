@@ -693,6 +693,70 @@ files:
           }
       }
     learner_created: false
+  - name: userData.txt
+    visible: true
+    text: |
+      Login: 13660805062, Password: jMkB0INQPqnkL, Registration time: 2024-03-05 16:47
+      Login: 10907167043, Password: xLNsG38gNuw6!xDOvz, Registration time: 2024-03-05 16:47
+      Login: 15256940666, Password: shwfwf1SdyZv@TrcuXZLfJx, Registration time: 2024-03-05 16:47
+      Login: 19563741723, Password: 0toKqn6eQKF6QSaE#8, Registration time: 2024-03-05 16:47
+      Login: 11990105908, Password: hDc7lna5yes, Registration time: 2024-03-05 16:47
+      Login: 12896892790, Password: KNMtmv!LsLi3SJLDo9EW!B O, Registration time: 2024-03-05 16:47
+      Login: 16046333616, Password: ftwL1mxtbk!WXOUc, Registration time: 2024-03-05 16:47
+      Login: 11438585428, Password: ZDGnkTPx8Ik0SNDW@Wx, Registration time: 2024-03-05 16:47
+      Login: 16211938415, Password: Z57!3TeD, Registration time: 2024-03-05 16:47
+      Login: 18451451328, Password: arkNsiQU75g, Registration time: 2024-03-05 16:47
+      Login: 19933179079, Password: LJ5QUa#VjwTL OHn, Registration time: 2024-03-05 16:47
+      Login: 15950547264, Password: #UbuQ6TfXn@%C7X5 M%tL%M, Registration time: 2024-03-05 16:47
+      Login: 13499108606, Password: y6QfXBYEgi, Registration time: 2024-03-05 16:47
+      Login: 10230685369, Password: #BZN6cyyPV2$YlxY5qC1fz, Registration time: 2024-03-05 16:47
+      Login: 16838027521, Password: # yoEzQ7W#SI, Registration time: 2024-03-05 16:47
+      Login: 13413251805, Password: J#1WgosV1, Registration time: 2024-03-05 16:47
+      Login: 10554646573, Password: IijYZU8dRaVW QiMKn!SOKFAS, Registration time: 2024-03-05 16:47
+      Login: 10532417273, Password: c7X!MprP9e, Registration time: 2024-03-05 16:47
+      Login: 19184193655, Password: ZpNZOB%tW7 eP, Registration time: 2024-03-05 16:47
+      Login: 12778977208, Password: YO$oU%X33mvVzhmvflmk4RmU, Registration time: 2024-03-05 16:47
+      Login: 14425734527, Password: xq20XW! $HB@j6qK%3, Registration time: 2024-03-05 16:47
+      Login: 11516466873, Password: M l4mximBSJhPiveuXOf, Registration time: 2024-03-05 16:47
+      Login: 17015247738, Password: OE8Ccs e6FIE@#%xqvhnW, Registration time: 2024-03-05 16:47
+      Login: 19887912710, Password: F50aNA14@ #Qe@O%y, Registration time: 2024-03-05 16:47
+      Login: 10201203179, Password: D6goH6ZhFYGUq!mFb, Registration time: 2024-03-05 16:47
+      Login: 19880427630, Password: U5r@ZztvnBkdcEv%Hwp1B!Q, Registration time: 2024-03-05 16:47
+      Login: 14625783812, Password: @k2eZEa0g, Registration time: 2024-03-05 16:47
+      Login: 10793541637, Password: b#AVQFi686ysd$ieK0b, Registration time: 2024-03-05 16:47
+      Login: 18194799123, Password: $nS$2 00, Registration time: 2024-03-05 16:47
+      Login: 11874639782, Password: 50!hcgSMXJpJyx, Registration time: 2024-03-05 16:47
+      Login: 13152995640, Password: u5VpAc1rB0y%wTf6, Registration time: 2024-03-05 16:47
+      Login: 16902883423, Password: oOEki6 oiLZQoWqd3uvN, Registration time: 2024-03-05 16:47
+      Login: 17425025242, Password: 1XGp0yfsspow$KgmyPRNYhs$h, Registration time: 2024-03-05 16:47
+      Login: 18251920545, Password: bXF37F4, Registration time: 2024-03-05 16:47
+      Login: 14032330162, Password: xBq44NY, Registration time: 2024-03-05 16:47
+      Login: 13957108653, Password: livxpr73gJE, Registration time: 2024-03-05 16:47
+      Login: 14477381270, Password: e1yJ2pWo!d#tU 77I, Registration time: 2024-03-05 16:47
+      Login: 16647416154, Password: 9DM8nxCEQ, Registration time: 2024-03-05 16:47
+      Login: 12302274632, Password: VE$RhqRcH0nsAkMurshn4pK%4, Registration time: 2024-03-05 16:47
+    learner_created: true
+  - name: src/banking/UserDetail.java
+    visible: true
+    learner_created: true
+  - name: src/banking/UserList.java
+    visible: true
+    learner_created: true
+  - name: src/banking/Validators.java
+    visible: true
+    learner_created: true
+  - name: src/banking/Helpers.java
+    visible: true
+    learner_created: true
+  - name: src/banking/UserInteractions.java
+    visible: true
+    learner_created: true
+  - name: src/banking/PasswordUtils.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/386/stages/2297/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 09 Mar 2024 14:25:44 UTC"
 record: -1
