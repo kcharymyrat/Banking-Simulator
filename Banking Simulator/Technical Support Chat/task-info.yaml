@@ -1493,6 +1493,781 @@ files:
           }
       }
     learner_created: false
+  - name: src/banking/Helpers.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.util.Random;
+      import java.util.Scanner;
+      
+      public class Helpers {
+      
+          static String getInput(Scanner scanner) {
+              return scanner.nextLine().strip().trim();
+          }
+      
+          public static int getRandomIndex(int length) {
+              Random random = new Random();
+              return random.nextInt(length);
+          }
+      
+      
+          static String cleanLogin(String login) {
+              var loginStringBuilder = new StringBuilder();
+      
+              for (char ch : login.toCharArray()) {
+                  String chStr = String.valueOf(ch);
+                  if (chStr.matches("\\d")) {
+                      loginStringBuilder.append(chStr);
+                  }
+              }
+              return loginStringBuilder.toString();
+          }
+      }
+    learner_created: true
+  - name: src/banking/Validators.java
+    visible: true
+    text: |
+      package banking;
+      
+      public class Validators {
+      
+          public static boolean isValidPhoneNumber(String phoneNumber) {
+              String pattern = "^\\+?1?(?:-?\\(\\d{1,3}\\)-?|\\s?\\d{1,3}(?:-?\\d{3}){3})$";
+              return phoneNumber.matches(pattern);
+          }
+      
+          public static boolean isValidPassword(String password) {
+              String pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d!@#$%]+(\\s?[a-zA-Z\\d!@#$%]+)*$";
+              return password.matches(pattern) && password.length() >= 6 && password.length() <= 28;
+          }
+      }
+    learner_created: true
+  - name: src/banking/PasswordUtils.java
+    visible: true
+    text: |
+      package banking;
+      
+      import javax.crypto.SecretKeyFactory;
+      import javax.crypto.spec.PBEKeySpec;
+      import java.security.NoSuchAlgorithmException;
+      import java.security.SecureRandom;
+      import java.security.spec.InvalidKeySpecException;
+      import java.util.Base64;
+      
+      public class PasswordUtils {
+      
+          private static final int SALT_LENGTH = 16;
+          private static final int ITERATIONS = 10000;
+          private static final int KEY_LENGTH = 256;
+      
+          // Method for generating salt
+          public static byte[] generateSalt() {
+              SecureRandom random = new SecureRandom();
+              byte[] salt = new byte[SALT_LENGTH];
+              random.nextBytes(salt);
+              return salt;
+          }
+      
+          // Method for password hashing
+          public static String hashPassword(String password, byte[] salt) {
+              char[] passwordChars = password.toCharArray();
+              PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, ITERATIONS, KEY_LENGTH);
+              try {
+                  SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+                  byte[] hash = factory.generateSecret(spec).getEncoded();
+                  return Base64.getEncoder().encodeToString(hash);
+              } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                  e.printStackTrace(); // Handle error appropriately
+                  return null;
+              }
+          }
+      
+          // Method for registration
+          public static String register(String password) {
+              byte[] salt = generateSalt();
+              return hashPassword(password, salt);
+          }
+      
+          // Method for password verification
+          public static boolean verifyPassword(String enteredPassword, String storedPassword, byte[] salt) {
+              String hashedEnteredPassword = hashPassword(enteredPassword, salt);
+              return hashedEnteredPassword != null && hashedEnteredPassword.equals(storedPassword);
+          }
+      
+      }
+    learner_created: true
+  - name: src/banking/UserList.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.io.*;
+      import java.time.LocalDateTime;
+      import java.time.format.DateTimeFormatter;
+      import java.util.*;
+      
+      import static banking.PasswordUtils.*;
+      
+      public class UserList {
+          private ArrayList<UserDetail> users;
+      
+          static List<UserDetail> getUserDetailList(String filePath) {
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+              File file = new File(filePath);
+              List<UserDetail> userDetailList = new ArrayList<>();
+              // System.out.printf("File = %s\n", file);
+      
+              String fieldsSeparator = "\\|";
+              String keyValueSeparator = ": ";
+      
+              try (Scanner scanner = new Scanner(file)) {
+                  while (scanner.hasNext()) {
+                      UserDetail userDetail = new UserDetail();
+      
+                      String line = scanner.nextLine();
+                      List<String> fields = List.of(line.split(fieldsSeparator));
+                      // System.out.printf("fields = %s\n", fields);
+                      for (String field : fields) {
+                          // Process the field
+                          List<String> fieldKeyValue = List.of(field.split(keyValueSeparator));
+                          String key = fieldKeyValue.get(0).trim();
+                          String value = fieldKeyValue.get(1).trim();
+                          // System.out.printf("|%s:%s|\n", key, value);
+      
+                          switch (key) {
+                              case "Login" -> userDetail.setLogin(value);
+                              case "Password" -> userDetail.setPassword(value);
+                              case "Salt" -> userDetail.setSalt(value);
+                              case "Registration time" ->
+                                      userDetail.setRegistrationTime(LocalDateTime.parse(value, formatter));
+                              case "Last authorization session" ->
+                                      userDetail.setLastAuthorizationSession(LocalDateTime.parse(value, formatter));
+                              case "Access" -> {
+                                  ArrayList<LocalDateTime> accessDateTimes = getAccessLocalDateTimes(value, formatter);
+                                  userDetail.setAccess(accessDateTimes);
+                              }
+                          }
+                      }
+                      userDetailList.add(userDetail);
+      
+                  }
+              } catch (FileNotFoundException e) {
+                  System.out.println("No file found: " + "userData.txt");
+              }
+      
+              // System.out.println(userDetailList);
+              return userDetailList;
+          }
+      
+          private static ArrayList<LocalDateTime> getAccessLocalDateTimes(String value, DateTimeFormatter formatter) {
+              if (Objects.equals(value.trim(), "[]")) {
+                  return new ArrayList<LocalDateTime>();
+              }
+      
+              ArrayList<LocalDateTime> accessDateTimes = new ArrayList<LocalDateTime>();
+              String valueSubstr = value.substring(1, value.length() - 1);
+              List<String> unsuccessfulAccesses = List.of(valueSubstr.split(","));
+      
+      //        if (unsuccessfulAccesses.size() == 1) {
+      //            LocalDateTime accessDateTime = LocalDateTime.parse(unsuccessfulAccesses.get(0), formatter);
+      //            accessDateTimes.add(accessDateTime);
+      //            return accessDateTimes;
+      //        }
+      
+              for (String access : unsuccessfulAccesses) {
+                  LocalDateTime accessDateTime = LocalDateTime.parse(access.split(" - ")[1].trim(), formatter);
+                  accessDateTimes.add(accessDateTime);
+              }
+              return accessDateTimes;
+          }
+      
+          static void addUserDetailToFile(String username, String password, String filePath) throws IOException {
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+      
+              LocalDateTime currentDateTime = LocalDateTime.now();
+              String formattedDateTime = currentDateTime.format(formatter);
+              byte[] saltBytes = generateSalt();
+      
+              String hashPassword = hashPassword(password, saltBytes);
+              String salt = Base64.getEncoder().encodeToString(saltBytes);
+              String access = "[]";
+      
+              try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+      
+                  String line = "Login: " + username.trim() +
+                          "| Password: " + hashPassword +
+                          "| Salt: " + salt +
+                          "| Registration time: " + formattedDateTime +
+                          "| Last authorization session: " + formattedDateTime +
+                          "| Access: " + access;
+      
+                  writer.write(line);
+                  writer.newLine(); // Add a newline after the line
+              }
+          }
+      
+          static void writeUserDetailListToFile(List<UserDetail> userDetailList, String filePath) throws IOException {
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+      
+              try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
+      
+                  for (UserDetail user : userDetailList) {
+                      String line = "Login: " + user.getLogin() +
+                              "| Password: " + user.getPassword() +
+                              "| Salt: " + user.getSalt() +
+                              "| Registration time: " + user.getRegistrationTime().format(formatter) +
+                              "| Last authorization session: " + user.getLastAuthorizationSession().format(formatter) +
+                              "| Access: " + setAccessLocalDateTimeToString(user.getAccess(), formatter);
+      
+                      writer.write(line);
+                      writer.newLine();
+                  }
+      
+              }
+          }
+      
+          static List<String> setAccessLocalDateTimeToString(List<LocalDateTime> accesses, DateTimeFormatter formatter) {
+              List<String> accessesString = new ArrayList<>();
+              for (LocalDateTime access: accesses) {
+                  accessesString.add("Unsuccessful access attempt - " + access.format(formatter));
+              }
+              return accessesString;
+          }
+      }
+    learner_created: true
+  - name: src/banking/UserDetail.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.time.LocalDateTime;
+      import java.util.ArrayList;
+      
+      public class UserDetail {
+          private String login;
+          private String password;
+          private String salt;
+          private LocalDateTime registrationTime;
+          private LocalDateTime lastAuthorizationSession;
+          private ArrayList<LocalDateTime> access;
+      
+          public UserDetail() {
+          }
+      
+          public UserDetail(String login, String password, String salt,
+                            LocalDateTime registrationTime, LocalDateTime lastAuthorizationSession,
+                            ArrayList<LocalDateTime> access) {
+              this.login = login;
+              this.password = password;
+              this.salt = salt;
+              this.registrationTime = registrationTime;
+              this.lastAuthorizationSession = lastAuthorizationSession;
+              this.access = access;
+          }
+      
+          // Getters
+          public String getLogin() {
+              return login;
+          }
+      
+          public String getPassword() {
+              return password;
+          }
+      
+          public String getSalt() {
+              return salt;
+          }
+      
+          public LocalDateTime getRegistrationTime() {
+              return registrationTime;
+          }
+      
+          public LocalDateTime getLastAuthorizationSession() {
+              return lastAuthorizationSession;
+          }
+      
+          public ArrayList<LocalDateTime> getAccess() {
+              return access;
+          }
+      
+          // Setters
+          public void setLogin(String login) {
+              this.login = login;
+          }
+      
+          public void setPassword(String password) {
+              this.password = password;
+          }
+      
+          public void setSalt(String salt) {
+              this.salt = salt;
+          }
+      
+          public void setRegistrationTime(LocalDateTime registrationTime) {
+              this.registrationTime = registrationTime;
+          }
+      
+          public void setLastAuthorizationSession(LocalDateTime lastAuthorizationSession) {
+              this.lastAuthorizationSession = lastAuthorizationSession;
+          }
+      
+          public void setAccess(ArrayList<LocalDateTime> access) {
+              this.access = access;
+          }
+      
+          public void addToAccess(LocalDateTime invalid) {
+              if (this.access.size() < 3) {
+                  this.access.add(invalid);
+              } else {
+                  this.access.remove(0);
+                  this.access.add(invalid);
+              }
+          }
+      
+          @Override
+          public String toString() {
+              StringBuilder sb = new StringBuilder();
+              sb.append("UserDetail {");
+              sb.append("\n\tlogin : ").append(login).append(", ");
+              sb.append("\n\tpassword : ").append(password).append(", ");
+              sb.append("\n\tsalt : ").append(salt).append(", ");
+              sb.append("\n\tregistrationTime : ").append(registrationTime).append(", ");
+              sb.append("\n\tlastAuthorizationSession : ").append(lastAuthorizationSession).append(", ");
+              sb.append("\n\taccess : ").append(getAccess());
+              sb.append("\n}");
+              return sb.toString();
+          }
+      }
+    learner_created: true
+  - name: userData.txt
+    visible: true
+    text: |
+      Login: 17083881018| Password: EJjhx6IaBOODmIzG5uDbubfGAjwRYy96KP9K1e0DlKM=| Salt: LtqkkIKhE1zNBIWa3Ps77A==| Registration time: 2024-03-10 01:08| Last authorization session: 2024-03-10 01:09| Access: [Unsuccessful access attempt - 2024-03-10 01:09]
+      Login: 15708734273| Password: gnDhyrjsgdUOm8tMZNhRvxp19v4QOlWy8O/geR6D4y4=| Salt: KmcaodNGIegJping/jFbjA==| Registration time: 2024-03-10 01:08| Last authorization session: 2024-03-10 01:09| Access: [Unsuccessful access attempt - 2024-03-10 01:09, Unsuccessful access attempt - 2024-03-10 01:09]
+      Login: 16794239334| Password: xvUEADPIZNZGpidIZZTACJhtuSb2d8H2aCwWwflO+No=| Salt: +tuCtdzYaiSYsgXIKeAwww==| Registration time: 2024-03-10 01:08| Last authorization session: 2024-03-10 01:09| Access: [Unsuccessful access attempt - 2024-03-10 01:08, Unsuccessful access attempt - 2024-03-10 01:08, Unsuccessful access attempt - 2024-03-10 01:09]
+    learner_created: true
+  - name: src/banking/Rate.java
+    visible: true
+    text: |
+      package banking;
+      
+      public class Rate {
+          private String base;
+          private String usd;
+      
+          public Rate(String base, String usd) {
+              this.base = base;
+              this.usd = usd;
+          }
+      
+          public String getBase() {
+              return base;
+          }
+      
+          public void setBase(String base) {
+              this.base = base;
+          }
+      
+          public String getUsd() {
+              return usd;
+          }
+      
+          public void setUsd(String usd) {
+              this.usd = usd;
+          }
+      
+          @Override
+          public String toString() {
+              return "Rate{" +
+                      "base='" + base + '\'' +
+                      ", usd='" + usd + '\'' +
+                      '}';
+          }
+      }
+    learner_created: true
+  - name: src/banking/UserInteractions.java
+    visible: true
+    text: |-
+      package banking;
+      
+      import java.io.IOException;
+      import java.time.LocalDateTime;
+      import java.time.format.DateTimeFormatter;
+      import java.util.*;
+      import java.util.stream.Collectors;
+      import java.net.http.HttpResponse;
+      
+      import static banking.ExchangeRates.*;
+      import static banking.Helpers.*;
+      import static banking.PasswordUtils.hashPassword;
+      import static banking.UserList.*;
+      import static banking.Validators.isValidPassword;
+      import static banking.Validators.isValidPhoneNumber;
+      
+      public class UserInteractions {
+      
+          static HttpResponse<String> response = getExchangeResponse();
+          static List<Rate> rateList = parseResponse(response);
+      
+          private static final String[] loginGreetings = {
+                  "Welcome to your personal banking",
+                  "Welcome back!",
+                  "We've been waiting for you!",
+                  "Good to see you!",
+                  "ZZzzzzZ... ERROR... It's a joke, it's ok, welcome back!"
+          };
+      
+          static void registrationChoiceMenu(Scanner scanner, List<UserDetail> userDetailList, String filePath) throws IOException {
+              String login = "";
+              String password = "";
+      
+              System.out.println("Registration");
+              List<String> usernames = userDetailList.stream().map(UserDetail::getLogin).collect(Collectors.toList());
+              login = getLoginInputRecursive(usernames, scanner);
+              password = getPasswordInputRecursive(scanner);
+      
+              addUserDetailToFile(login, password, filePath);
+      
+              userDetailList = getUserDetailList(filePath);
+              usernames = userDetailList.stream().map(UserDetail::getLogin).collect(Collectors.toList());
+              System.out.println();
+      
+              System.out.println("Enter the data again to complete the registration");
+              while (true) {
+                  System.out.println("Login:");
+                  String loginTrial = cleanLogin(getInput(scanner));
+      
+                  System.out.println("Password:");
+                  String passwordTrial = getInput(scanner);
+      
+                  if (!login.equalsIgnoreCase(loginTrial) && !password.equalsIgnoreCase(passwordTrial)) {
+                      System.out.println();
+                      System.out.println("Login and password don't match.");
+                  } else if (!login.equalsIgnoreCase(loginTrial)) {
+                      System.out.println();
+                      System.out.println("Login doesn't match.");
+                  } else if (!password.equalsIgnoreCase(passwordTrial)) {
+                      System.out.println();
+                      System.out.println("Passwords don't match");
+                  }
+      
+                  if (login.equalsIgnoreCase(loginTrial) && password.equalsIgnoreCase(passwordTrial)) {
+                      break;
+                  }
+              }
+      
+              System.out.println();
+              System.out.println("Congratulations on your successful registration!");
+              System.out.println("Now you can log in!");
+              System.out.println();
+      
+      
+              while (true) {
+                  System.out.println("Authorization");
+                  System.out.println("Login:");
+                  String loginFinish = cleanLogin(getInput(scanner));
+      
+                  System.out.println("Password:");
+                  String passwordFinish = getInput(scanner);
+      
+                  Optional<UserDetail> userDetailOptional= userDetailList.stream()
+                          .filter(userDetail -> Objects.equals(userDetail.getLogin(), loginFinish))
+                          .findFirst();
+                  String userDetailLogin = userDetailOptional.map(UserDetail::getLogin).orElse(null);
+      
+                  if (userDetailLogin == null) {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+                  }
+      
+      
+                  if (login.equalsIgnoreCase(loginFinish) && password.equalsIgnoreCase(passwordFinish)) {
+                      successAuthorizationRandomText();
+      
+                      System.out.println("Menu");
+                      System.out.println("1. Exchange Rate, 2. Logout");
+                      menuAfterSuccessLogin(scanner);
+                      break;
+                  } else if (login.equalsIgnoreCase(loginFinish) && !password.equalsIgnoreCase(passwordFinish)) {
+                        System.out.println("The entered password does not match the login or the user does not exist.");
+      
+                        LocalDateTime currentDateTime = LocalDateTime.now();
+                        UserDetail userDetail = userDetailOptional.get();
+                        userDetail.setLastAuthorizationSession(currentDateTime);
+                        userDetail.addToAccess(currentDateTime);
+                        writeUserDetailListToFile(userDetailList, filePath);
+      
+                  } else {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+                  }
+              }
+          }
+      
+          static void loginChoice(Scanner scanner, List<UserDetail> userDetailList, String filePath) throws IOException {
+              while (true) {
+                  System.out.println("Authorization");
+                  System.out.println("Login:");
+                  String loginInput = cleanLogin(getInput(scanner));
+      
+                  System.out.println("Password:");
+                  String passwordInput = getInput(scanner);
+      
+                  Optional<UserDetail> userDetailOptional= userDetailList.stream()
+                          .filter(userDetail -> Objects.equals(userDetail.getLogin(), loginInput))
+                          .findFirst();
+                  String userDetailLogin = userDetailOptional.map(UserDetail::getLogin).orElse(null);
+      
+                  if (userDetailLogin == null) {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+                      continue;
+                  }
+      
+                  String userDetailPassword = userDetailOptional.map(UserDetail::getPassword).orElse(null);
+                  String userDetailSalt = userDetailOptional.map(UserDetail::getSalt).orElse(null);
+                  byte[] saltBytes = Base64.getDecoder().decode(userDetailSalt);
+                  String hashOfPasswordInput = hashPassword(passwordInput, saltBytes);
+      
+                  if (Objects.equals(userDetailLogin, loginInput) && !Objects.equals(userDetailPassword, hashOfPasswordInput)) {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+      
+                      LocalDateTime currentDateTime = LocalDateTime.now();
+                      UserDetail userDetail = userDetailOptional.get();
+                      userDetail.setLastAuthorizationSession(currentDateTime);
+                      userDetail.addToAccess(currentDateTime);
+                      writeUserDetailListToFile(userDetailList, filePath);
+      
+                  } else if (!Objects.equals(userDetailLogin, loginInput) || !Objects.equals(userDetailPassword, hashOfPasswordInput)) {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+                  } else {
+                      break;
+                  }
+              }
+      
+              successAuthorizationRandomText();
+      
+              System.out.println("Menu");
+              System.out.println("1. Exchange Rate, 2. Logout");
+              menuAfterSuccessLogin(scanner);
+      
+          }
+      
+          static void successAuthorizationRandomText() {
+              System.out.println("Authorization successful");
+              System.out.println();
+              int randomIndex = getRandomIndex(loginGreetings.length);
+              String randomGreeting = loginGreetings[randomIndex];
+              System.out.println(randomGreeting);
+          }
+      
+          static void menuAfterSuccessLogin(Scanner scanner) {
+      
+              String choice = getInput(scanner);
+              if (Objects.equals("1", choice)) {
+                  System.out.println();
+                  boolean backToMainMenu = false;
+                  System.out.println("Exchange rates");
+                  while (true) {
+                      boolean isGoBack = exchangeRateResult(scanner, rateList);
+                      if (isGoBack) {
+                          backToMainMenu = true;
+                          break;
+                      }
+                      boolean isTryAnotherCurrency = tryAnotherCurrency(scanner);
+                      if (!isTryAnotherCurrency) {
+                          break;
+                      }
+                  }
+      
+                  if (backToMainMenu) {
+                      System.out.println("Menu");
+                      System.out.println("1. Exchange Rate, 2. Logout");
+                      menuAfterSuccessLogin(scanner);
+                  }
+      
+              }else if (Objects.equals("2", choice)) {
+                  System.out.println("Goodbye");
+              } else {
+                  System.out.println("Invalid choice. Please enter a valid option number '1' or '2':");
+                  menuAfterSuccessLogin(scanner);
+              }
+          }
+      
+          static boolean exchangeRateResult(Scanner scanner, List<Rate> rateList) {
+              boolean isGoBack = false;
+      
+              Rate rate = null;
+              boolean exitToMenu = false;
+      
+              System.out.println("1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back");
+      
+              do {
+                  String currencyChoice = getInput(scanner);
+      
+                  switch (currencyChoice) {
+                      case "1":
+                          rate = getRate(rateList, "EUR");
+                          exitToMenu = true;
+                          break;
+                      case "2":
+                          rate = getRate(rateList, "GBP");
+                          exitToMenu = true;
+                          break;
+                      case "3":
+                          rate = getRate(rateList, "UAH");
+                          exitToMenu = true;
+                          break;
+                      case "4":
+                          rate = getRate(rateList, "CNY");
+                          exitToMenu = true;
+                          break;
+                      case "5":
+                          exitToMenu = true;
+                          isGoBack = true;
+                          break;
+                      default:
+                          System.out.println("Incorrect currency code, try again.");
+                          System.out.println("(1. EUR, 2. GBP, 3. UAH, 4. CNY, or 5. Back):");
+                  }
+              } while (!exitToMenu);
+      
+              if (rate != null) {
+                  String message = String.format(
+                          "Currency exchange: USD to %s exchange rate: %s\n", rate.getBase(), rate.getUsd()
+                  );
+                  System.out.println(message);
+              }
+      
+              return isGoBack;
+          }
+      
+          static boolean tryAnotherCurrency(Scanner scanner) {
+              System.out.println("Would you like to choose another currency? (Y/N)");
+      
+              while (true) {
+                  String yOrN = getInput(scanner);
+                  if (Objects.equals(yOrN.toUpperCase(), "Y")) {
+                      // 1. EUR, 2. GBP, 3. UAH, 4. CNY, 5. Back
+                      return true;
+                  } else if (Objects.equals(yOrN.toUpperCase(), "N")) {
+                      // return to the main menu
+                      return false;
+                  } else {
+                      System.out.println("Invalid input! (Y/N):");
+                  }
+              }
+          }
+      
+          static String getLoginInputRecursive(List<String> usernames, Scanner scanner) {
+              System.out.println("Login:");
+              String login = cleanLogin(getInput(scanner));
+      
+              if (!isValidPhoneNumber(login)) {
+                  System.out.println("Wrong login format, try again");
+                  return getLoginInputRecursive(usernames, scanner);
+              }
+      
+              if (usernames.contains(login) || usernames.contains("+" + login)) {
+                  System.out.println("Login is already taken, try another login");
+                  return getLoginInputRecursive(usernames, scanner);
+              }
+      
+              return login;
+          }
+      
+          static String getPasswordInputRecursive(Scanner scanner) {
+              System.out.println("Password:");
+              String password = getInput(scanner).trim();
+              if (!isValidPassword(password)){
+                  System.out.println("Wrong password format, try again");
+                  return getPasswordInputRecursive(scanner);
+              }
+              return password;
+          }
+      }
+    learner_created: true
+  - name: src/banking/ExchangeRates.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.net.URI;
+      import java.net.http.HttpClient;
+      import java.net.http.HttpRequest;
+      import java.net.http.HttpResponse;
+      import java.util.ArrayList;
+      import java.util.Arrays;
+      import java.util.List;
+      
+      public class ExchangeRates {
+      
+          static String url = "http://localhost:8080/hyperskill-exchange/api/latest.json?app_id=ASDcvv14Dfvv67539a551345n2l34kjklhv012";
+          static HttpResponse<String>  getExchangeResponse() {
+              HttpClient httpClient = HttpClient.newHttpClient();
+      
+              URI exchangeWebAddress = URI.create(url);
+      
+              HttpRequest request = HttpRequest.newBuilder()
+                      .uri(exchangeWebAddress)
+                      .GET()
+                      .build();
+      
+              try {
+                  return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+              } catch (Exception e) {
+                  System.out.println("We cannot access the site. Please, try later.");
+                  return null;
+              }
+          }
+      
+          static List<Rate> parseResponse(HttpResponse<String> response) {
+              List<Rate> rateList = new ArrayList<>();
+      
+              if (response == null || response.statusCode() != 200) {
+                  return null;
+              }
+              String resBody = response.body();
+              // {"rates":{"USD":0.991},"base":"EUR"}
+              // {"rates":{"USD":0.762},"base":"GBP"}
+              // {"rates":{"USD":36.669},"base":"UAH"}
+              // {"rates":{"USD":7.135},"base":"CNY"}
+      
+              List<String> responseRates = List.of(resBody.split("\\n"));
+      
+              for (String rate : responseRates) {
+                  List<String> subStrList = List.of(rate.trim()
+                          .replaceAll("\\{\"rates\":.*\"USD\":", "")
+                          .replaceAll("},\"base\":\"", " ")
+                          .replaceAll("\"}", "")
+                          .split(" "));
+                  // System.out.println(subStrList);
+                  rateList.add(new Rate(subStrList.get(1).trim(), subStrList.get(0).trim()));
+              }
+              // System.out.println(rateList);
+              return rateList;
+          }
+      
+          static Rate getRate(List<Rate> rateList, String currency) {
+              return rateList.stream()
+                      .filter(rate -> rate.getBase().equalsIgnoreCase(currency.trim()))
+                      .findFirst()
+                      .orElse(null);
+          }
+      }
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/386/stages/2299/implement#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: "Wrong answer in test #1\n\nYour program should print &#39;1. Exchange\
+    \ Rates, 2. Chat Support, 3. Security Settings, 4. Exit&#39; but it printed &#39;1.\
+    \ Exchange Rate, 2. Logout&#39;\n\nPlease find below the output of your program\
+    \ during this failed test.\nNote that the &#39;&gt;&#39; character indicates the\
+    \ beginning of the input line.\n\n---\n\nWould you like to login or register?\n\
+    1. Login, 2. Register: \n&gt; 2\nRegistration\nLogin:\n&gt; 11805144712\nPassword:\n\
+    &gt; nV1w2NU!rcSo4YE\n\nEnter the data again to complete the registration\nLogin:\n\
+    &gt; 11805144712\nPassword:\n&gt; nV1w2NU!rcSo4YE\n\nCongratulations on your successful\
+    \ registration!\nNow you can log in!\n\nAuthorization\nLogin:\n&gt; 11805144712\n\
+    Password:\n&gt; nV1w2NU!rcSo4YE\nAuthorization successful\n\nGood to see you!\n\
+    Menu\n1. Exchange Rate, 2. Logout"
+  time: "Sat, 09 Mar 2024 20:11:21 UTC"
 record: -1

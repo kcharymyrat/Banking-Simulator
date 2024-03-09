@@ -1,15 +1,14 @@
 package banking;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static banking.Helpers.*;
-import static banking.UserInteractions.*;
+import static banking.Helpers.getInput;
+import static banking.UserInteractions.loginChoice;
+import static banking.UserInteractions.registrationChoiceMenu;
 import static banking.UserList.getUserDetailList;
 
 public class MainBank {
@@ -18,7 +17,7 @@ public class MainBank {
 
     public static void main(String[] args) throws IOException {
         // Path currentPath = Paths.get("");
-        //System.out.println("Current Path: " + ((Path) currentPath).toAbsolutePath());
+        // System.out.println("Current Path: " + ((Path) currentPath).toAbsolutePath());
         // Current Path: D:\JetBrainsWork\Banking Simulator\Banking Simulator\task
         // final String filePath = ".\\Banking Simulator\\task\\userData.txt";
         // System.out.println(userDetialList);
@@ -47,71 +46,4 @@ public class MainBank {
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    //    private stageTwo() {
-//        String login = "";
-//        String password = "";
-//
-//        System.out.println("Registration");
-//
-//        login = getLoginInputRecursive(usernames);
-//        password = getPasswordInputRecursive();
-//
-//        addUsernameToFile(login, password, filePath);
-//        usernames = getUsernames(filePath);
-//
-//        System.out.println();
-//        System.out.println("Enter the data again to complete the registration");
-//
-//        while (true) {
-//            System.out.println("Login:");
-//            String loginTrial = cleanLogin(getInput());
-//
-//            System.out.println("Password:");
-//            String passwordTrial = getInput();
-//
-//            if (!login.equalsIgnoreCase(loginTrial) && !password.equalsIgnoreCase(passwordTrial)) {
-//                System.out.println();
-//                System.out.println("Login and password don't match.");
-//            } else if (!login.equalsIgnoreCase(loginTrial)) {
-//                System.out.println();
-//                System.out.println("Login doesn't match.");
-//            } else if (!password.equalsIgnoreCase(passwordTrial)) {
-//                System.out.println();
-//                System.out.println("Passwords don't match");
-//            }
-//
-//            if (login.equalsIgnoreCase(loginTrial) && password.equalsIgnoreCase(passwordTrial)) {
-//                break;
-//            }
-//        }
-//
-//        System.out.println();
-//        System.out.println("Now you can log in for finishing the registration.");
-//        System.out.println("Login:");
-//        String loginFinish = cleanLogin(getInput());
-//
-//        System.out.println("Password:");
-//        String passwordFinish = getInput();
-//
-//        if (login.equalsIgnoreCase(loginFinish) && password.equalsIgnoreCase(passwordFinish)) {
-//            System.out.println("Authorization successful");
-//            System.out.println("Congratulations on your successful registration!");
-//        } else {
-//            System.out.println("Authorization failed");
-//        }
-//
-//        scanner.close();
-//    }
-//
 }

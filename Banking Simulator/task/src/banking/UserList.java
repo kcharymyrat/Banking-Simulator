@@ -62,9 +62,17 @@ public class UserList {
         if (Objects.equals(value.trim(), "[]")) {
             return new ArrayList<LocalDateTime>();
         }
+
         ArrayList<LocalDateTime> accessDateTimes = new ArrayList<LocalDateTime>();
         String valueSubstr = value.substring(1, value.length() - 1);
         List<String> unsuccessfulAccesses = List.of(valueSubstr.split(","));
+
+//        if (unsuccessfulAccesses.size() == 1) {
+//            LocalDateTime accessDateTime = LocalDateTime.parse(unsuccessfulAccesses.get(0), formatter);
+//            accessDateTimes.add(accessDateTime);
+//            return accessDateTimes;
+//        }
+
         for (String access : unsuccessfulAccesses) {
             LocalDateTime accessDateTime = LocalDateTime.parse(access.split(" - ")[1].trim(), formatter);
             accessDateTimes.add(accessDateTime);
@@ -95,5 +103,33 @@ public class UserList {
             writer.write(line);
             writer.newLine(); // Add a newline after the line
         }
+    }
+
+    static void writeUserDetailListToFile(List<UserDetail> userDetailList, String filePath) throws IOException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false))) {
+
+            for (UserDetail user : userDetailList) {
+                String line = "Login: " + user.getLogin() +
+                        "| Password: " + user.getPassword() +
+                        "| Salt: " + user.getSalt() +
+                        "| Registration time: " + user.getRegistrationTime().format(formatter) +
+                        "| Last authorization session: " + user.getLastAuthorizationSession().format(formatter) +
+                        "| Access: " + setAccessLocalDateTimeToString(user.getAccess(), formatter);
+
+                writer.write(line);
+                writer.newLine();
+            }
+
+        }
+    }
+
+    static List<String> setAccessLocalDateTimeToString(List<LocalDateTime> accesses, DateTimeFormatter formatter) {
+        List<String> accessesString = new ArrayList<>();
+        for (LocalDateTime access: accesses) {
+            accessesString.add("Unsuccessful access attempt - " + access.format(formatter));
+        }
+        return accessesString;
     }
 }

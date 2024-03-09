@@ -955,6 +955,529 @@ files:
           }
       }
     learner_created: false
+  - name: src/banking/Helpers.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.util.Random;
+      import java.util.Scanner;
+      
+      public class Helpers {
+      
+          static String getInput(Scanner scanner) {
+              return scanner.nextLine().strip().trim();
+          }
+      
+          public static int getRandomIndex(int length) {
+              Random random = new Random();
+              return random.nextInt(length);
+          }
+      
+      
+          static String cleanLogin(String login) {
+              var loginStringBuilder = new StringBuilder();
+      
+              for (char ch : login.toCharArray()) {
+                  String chStr = String.valueOf(ch);
+                  if (chStr.matches("\\d")) {
+                      loginStringBuilder.append(chStr);
+                  }
+              }
+              return loginStringBuilder.toString();
+          }
+      }
+    learner_created: true
+  - name: src/banking/Validators.java
+    visible: true
+    text: |
+      package banking;
+      
+      public class Validators {
+      
+          public static boolean isValidPhoneNumber(String phoneNumber) {
+              String pattern = "^\\+?1?(?:-?\\(\\d{1,3}\\)-?|\\s?\\d{1,3}(?:-?\\d{3}){3})$";
+              return phoneNumber.matches(pattern);
+          }
+      
+          public static boolean isValidPassword(String password) {
+              String pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d!@#$%]+(\\s?[a-zA-Z\\d!@#$%]+)*$";
+              return password.matches(pattern) && password.length() >= 6 && password.length() <= 28;
+          }
+      }
+    learner_created: true
+  - name: src/banking/PasswordUtils.java
+    visible: true
+    text: |
+      package banking;
+      
+      import javax.crypto.SecretKeyFactory;
+      import javax.crypto.spec.PBEKeySpec;
+      import java.security.NoSuchAlgorithmException;
+      import java.security.SecureRandom;
+      import java.security.spec.InvalidKeySpecException;
+      import java.util.Base64;
+      
+      public class PasswordUtils {
+      
+          private static final int SALT_LENGTH = 16;
+          private static final int ITERATIONS = 10000;
+          private static final int KEY_LENGTH = 256;
+      
+          // Method for generating salt
+          public static byte[] generateSalt() {
+              SecureRandom random = new SecureRandom();
+              byte[] salt = new byte[SALT_LENGTH];
+              random.nextBytes(salt);
+              return salt;
+          }
+      
+          // Method for password hashing
+          public static String hashPassword(String password, byte[] salt) {
+              char[] passwordChars = password.toCharArray();
+              PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, ITERATIONS, KEY_LENGTH);
+              try {
+                  SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+                  byte[] hash = factory.generateSecret(spec).getEncoded();
+                  return Base64.getEncoder().encodeToString(hash);
+              } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                  e.printStackTrace(); // Handle error appropriately
+                  return null;
+              }
+          }
+      
+          // Method for registration
+          public static String register(String password) {
+              byte[] salt = generateSalt();
+              return hashPassword(password, salt);
+          }
+      
+          // Method for password verification
+          public static boolean verifyPassword(String enteredPassword, String storedPassword, byte[] salt) {
+              String hashedEnteredPassword = hashPassword(enteredPassword, salt);
+              return hashedEnteredPassword != null && hashedEnteredPassword.equals(storedPassword);
+          }
+      
+      }
+    learner_created: true
+  - name: src/banking/UserList.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.io.*;
+      import java.time.LocalDateTime;
+      import java.time.format.DateTimeFormatter;
+      import java.util.*;
+      
+      import static banking.PasswordUtils.*;
+      
+      public class UserList {
+          private ArrayList<UserDetail> users;
+      
+          static List<UserDetail> getUserDetailList(String filePath) {
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+              File file = new File(filePath);
+              List<UserDetail> userDetailList = new ArrayList<>();
+              // System.out.printf("File = %s\n", file);
+      
+              String fieldsSeparator = "\\|";
+              String keyValueSeparator = ": ";
+      
+              try (Scanner scanner = new Scanner(file)) {
+                  while (scanner.hasNext()) {
+                      UserDetail userDetail = new UserDetail();
+      
+                      String line = scanner.nextLine();
+                      List<String> fields = List.of(line.split(fieldsSeparator));
+                      // System.out.printf("fields = %s\n", fields);
+                      for (String field : fields) {
+                          // Process the field
+                          List<String> fieldKeyValue = List.of(field.split(keyValueSeparator));
+                          String key = fieldKeyValue.get(0).trim();
+                          String value = fieldKeyValue.get(1).trim();
+                          // System.out.printf("|%s:%s|\n", key, value);
+      
+                          switch (key) {
+                              case "Login" -> userDetail.setLogin(value);
+                              case "Password" -> userDetail.setPassword(value);
+                              case "Salt" -> userDetail.setSalt(value);
+                              case "Registration time" ->
+                                      userDetail.setRegistrationTime(LocalDateTime.parse(value, formatter));
+                              case "Last authorization session" ->
+                                      userDetail.setLastAuthorizationSession(LocalDateTime.parse(value, formatter));
+                              case "Access" -> {
+                                  ArrayList<LocalDateTime> accessDateTimes = getAccessLocalDateTimes(value, formatter);
+                                  userDetail.setAccess(accessDateTimes);
+                              }
+                          }
+                      }
+                      userDetailList.add(userDetail);
+      
+                  }
+              } catch (FileNotFoundException e) {
+                  System.out.println("No file found: " + "userData.txt");
+              }
+      
+              // System.out.println(userDetailList);
+              return userDetailList;
+          }
+      
+          private static ArrayList<LocalDateTime> getAccessLocalDateTimes(String value, DateTimeFormatter formatter) {
+              if (Objects.equals(value.trim(), "[]")) {
+                  return new ArrayList<LocalDateTime>();
+              }
+              ArrayList<LocalDateTime> accessDateTimes = new ArrayList<LocalDateTime>();
+              String valueSubstr = value.substring(1, value.length() - 1);
+              List<String> unsuccessfulAccesses = List.of(valueSubstr.split(","));
+              for (String access : unsuccessfulAccesses) {
+                  LocalDateTime accessDateTime = LocalDateTime.parse(access.split(" - ")[1].trim(), formatter);
+                  accessDateTimes.add(accessDateTime);
+              }
+              return accessDateTimes;
+          }
+      
+          static void addUserDetailToFile(String username, String password, String filePath) throws IOException {
+              DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+      
+              LocalDateTime currentDateTime = LocalDateTime.now();
+              String formattedDateTime = currentDateTime.format(formatter);
+              byte[] saltBytes = generateSalt();
+      
+              String hashPassword = hashPassword(password, saltBytes);
+              String salt = Base64.getEncoder().encodeToString(saltBytes);
+              String access = "[]";
+      
+              try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+      
+                  String line = "Login: " + username.trim() +
+                          "| Password: " + hashPassword +
+                          "| Salt: " + salt +
+                          "| Registration time: " + formattedDateTime +
+                          "| Last authorization session: " + formattedDateTime +
+                          "| Access: " + access;
+      
+                  writer.write(line);
+                  writer.newLine(); // Add a newline after the line
+              }
+          }
+      }
+    learner_created: true
+  - name: src/banking/UserDetail.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.time.LocalDateTime;
+      import java.util.ArrayList;
+      
+      public class UserDetail {
+          private String login;
+          private String password;
+          private String salt;
+          private LocalDateTime registrationTime;
+          private LocalDateTime lastAuthorizationSession;
+          private ArrayList<LocalDateTime> access;
+      
+          public UserDetail() {
+          }
+      
+          public UserDetail(String login, String password, String salt,
+                            LocalDateTime registrationTime, LocalDateTime lastAuthorizationSession,
+                            ArrayList<LocalDateTime> access) {
+              this.login = login;
+              this.password = password;
+              this.salt = salt;
+              this.registrationTime = registrationTime;
+              this.lastAuthorizationSession = lastAuthorizationSession;
+              this.access = access;
+          }
+      
+          // Getters
+          public String getLogin() {
+              return login;
+          }
+      
+          public String getPassword() {
+              return password;
+          }
+      
+          public String getSalt() {
+              return salt;
+          }
+      
+          public LocalDateTime getRegistrationTime() {
+              return registrationTime;
+          }
+      
+          public LocalDateTime getLastAuthorizationSession() {
+              return lastAuthorizationSession;
+          }
+      
+          public ArrayList<LocalDateTime> getAccess() {
+              return access;
+          }
+      
+          // Setters
+          public void setLogin(String login) {
+              this.login = login;
+          }
+      
+          public void setPassword(String password) {
+              this.password = password;
+          }
+      
+          public void setSalt(String salt) {
+              this.salt = salt;
+          }
+      
+          public void setRegistrationTime(LocalDateTime registrationTime) {
+              this.registrationTime = registrationTime;
+          }
+      
+          public void setLastAuthorizationSession(LocalDateTime lastAuthorizationSession) {
+              this.lastAuthorizationSession = lastAuthorizationSession;
+          }
+      
+          public void setAccess(ArrayList<LocalDateTime> access) {
+              this.access = access;
+          }
+      
+          public void addToAccess(LocalDateTime invalid) {
+              if (this.access.size() < 3) {
+                  this.access.add(invalid);
+              } else {
+                  this.access.remove(0);
+                  this.access.add(invalid);
+              }
+          }
+      
+          @Override
+          public String toString() {
+              StringBuilder sb = new StringBuilder();
+              sb.append("UserDetail {");
+              sb.append("\n\tlogin : ").append(login).append(", ");
+              sb.append("\n\tpassword : ").append(password).append(", ");
+              sb.append("\n\tsalt : ").append(salt).append(", ");
+              sb.append("\n\tregistrationTime : ").append(registrationTime).append(", ");
+              sb.append("\n\tlastAuthorizationSession : ").append(lastAuthorizationSession).append(", ");
+              sb.append("\n\taccess : ").append(getAccess());
+              sb.append("\n}");
+              return sb.toString();
+          }
+      }
+    learner_created: true
+  - name: userData.txt
+    visible: true
+    text: |
+      Login: 16132498614| Password: 50iVRa97/HCHUPrGyGbVSg0A7eV5SnKq4nTqgl+M12s=| Salt: yLgs5VPkIHx6cPE4kAO/9A==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 10696181021| Password: jKpvTH2/TyRZ99gI9RHQGXYELsyyAxQ8fbdAfNQyd0s=| Salt: 0B0XXPaiffCvN0bRfTAWuQ==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 13573363904| Password: ymuVwS5sZHRU3YlMA9I/BRB6LoUdoKx99SwvWph8wBM=| Salt: FAl7atNBes9/EFTH9hI45Q==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 14718523801| Password: P1jqAJbBwEC3LltbVB9jmTwbAJgYHo8EH/i1CYVplDQ=| Salt: jScqaJJzwB4mENNsw8yFEw==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 19689052219| Password: R+wCOGgPpoUh+OIZj4gf3QrMhPknowVBCbJGkiwkhw4=| Salt: CtXGc+WQKXO3FMDslD3Vgw==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 16418275461| Password: 3WZ1KdhJi2sbBNO1depu8Xw7gitnpb+yfvJg8IvZCIQ=| Salt: VhPLh5jV5QEoEhhcEZ3RtA==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 16854619485| Password: 1C54VDtBov+e254HADBePflMBdBFOShS7HqPN+8GbIw=| Salt: HtTRyyRIY48bDpyG+OTsxA==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 12312247295| Password: n91mmRe2FDVQdObibBYqkrAqM+UcaorbZZsrxaRiYKs=| Salt: L+S7KNbWH3cYQm9hmWVf9Q==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 16026753087| Password: wNtvZ/WZ0nMsIr6oQ07j+bdJOse+yufkHlHdsUNygrA=| Salt: EMEjHDKGMKggzY/iBymU+g==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 11065447184| Password: iPb8DYechyEhTmkCAevlc/L4s5lseOda3GPpU3+ZLSU=| Salt: R6lX5lcBhwlKBZ4Ce8OZZw==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 19290346209| Password: T97/jNVeEip7hacbFpMocRharSw6X1YO2LnuM+kbnJA=| Salt: R732I8z6GLvjSyZ/I8Qf+g==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 19297734307| Password: vsCGMgvQcOgxcPS3/Q/NMBCJiwbbQ+WNtu6Hfkb/v4Q=| Salt: OyywYsCpuWrem/z3Hg1PeA==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 18767695096| Password: +91OJbTkSKBSW60M6f3KA4MQGbHY6LRdv4BqEZSVaA8=| Salt: ONInsQTLY259P6F7exGdHQ==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 18415231955| Password: x5VsMV1TxFlRwXRgjyYxit8IOrwaISJXHNsgvtC1fvQ=| Salt: xHqg2+Lj+T/dK8xX+uhNxA==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 14923620482| Password: ZKzcBIkJXmBOtsoo1jC/gIjCvtIrZiNvDlICzNBJMVc=| Salt: CB9HQK6cJ5pO6YhH+RRwjg==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 17398516514| Password: Fyhb6CuUHj8AUYQ3S/0mZ8qOJZVHx+rgbveqRog41k8=| Salt: Al9x1Vw07TMWp8QfACUuFg==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 16982201212| Password: sLYGBuKCBSwk1EQMI49p+0DEi6RGkpO8rNsZDjRfT2M=| Salt: 8e207mIOkqZWxn0dcoI8/Q==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 17660985434| Password: 1sVgOYDBdRH6fDjLmQ+0yEvWsPM2i1a2p+h2qviQ0y8=| Salt: kaCDGtTU/nI/BjkzCwqLLg==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 13445293295| Password: XF+e5Lum5S9Pak0j36yozM7Xb1e0r6O64Zto+RCwBew=| Salt: DshbjqRv8zpkhknlyZOvmw==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 12275328421| Password: v8TlJTWQ3TPXqUT3Rl0wWLwAra0mlFgwIo5hZCGD8SI=| Salt: ecp9clwOAp04r5PkrV0ruQ==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 16452715609| Password: xwAkqFlWp9osFUHI0Qvqk8BJcgNqOzp6MSnAdQfNXdE=| Salt: e9nOIOrcCVEFff2ZlCk2+g==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 16891924146| Password: vlv42LQiB0caccvXCtYgEE3KmnkpBG5YFIxeWAoDEmQ=| Salt: RHR0kFtAjnwSpGGAh+r9Jg==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 15385088116| Password: rkWSxR3xd3FfT/XgKIV/khP2qYAuYOkhzpc2rfPyun0=| Salt: FyA7g0dr6ZYZkXIbeRlL8Q==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 18583514183| Password: eFxiyLZwCS+qclIbmG/Pz9lFxfIzFX8o32TzX2go6zw=| Salt: 8xyimMQmRfrkIv1nnBRZpw==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 10641900685| Password: +NqPQepRMhDtFeeYmQansshUXw8ctFgGfiEuNjXv5dA=| Salt: 4jKYnUTMo5nhgRxP1DS2vA==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 10526836185| Password: hdvOn0bHqy5TsotEjLU1QYm3V8Fqr9IhjTJAuldE86A=| Salt: QviNGUXG0PTxldmINredYA==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 11867351274| Password: zel+yAzd5652TQSOFnCesv1DhF05rayYVHyBkHVn1Rg=| Salt: YqIPf+eeeCupI0fhtXeVfg==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 11254776156| Password: 7zPpqbkFQb1Gv08gGRJQtyH2ZBQGH68gJdisKWniEMw=| Salt: 5uhDToUucD3101LyUR+1Rg==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+      Login: 19474646793| Password: gUPPYTIjb8fT/XfrNo4oevtpboj0fOiHfcvICeoIJkk=| Salt: gP+wpalnMgl3eWm+PZ81Zw==| Registration time: 2024-03-09 19:27| Last authorization session: 2024-03-09 19:27| Access: []
+    learner_created: true
+  - name: src/banking/UserInteractions.java
+    visible: true
+    text: |
+      package banking;
+      
+      import java.io.IOException;
+      import java.util.*;
+      import java.util.stream.Collectors;
+      
+      import static banking.Helpers.*;
+      import static banking.PasswordUtils.hashPassword;
+      import static banking.UserList.addUserDetailToFile;
+      import static banking.UserList.getUserDetailList;
+      import static banking.Validators.isValidPassword;
+      import static banking.Validators.isValidPhoneNumber;
+      
+      public class UserInteractions {
+      
+          private static final String[] loginGreetings = {
+                  "Welcome to your personal banking",
+                  "Welcome back!",
+                  "We've been waiting for you!",
+                  "Good to see you!",
+                  "ZZzzzzZ... ERROR... It's a joke, it's ok, welcome back!"
+          };
+      
+          static void registrationChoiceMenu(Scanner scanner, List<UserDetail> userDetailList, String filePath) throws IOException {
+              String login = "";
+              String password = "";
+      
+              System.out.println("Registration");
+              List<String> usernames = userDetailList.stream().map(UserDetail::getLogin).collect(Collectors.toList());
+              login = getLoginInputRecursive(usernames, scanner);
+              password = getPasswordInputRecursive(scanner);
+      
+              addUserDetailToFile(login, password, filePath);
+      
+              userDetailList = getUserDetailList(filePath);
+              usernames = userDetailList.stream().map(UserDetail::getLogin).collect(Collectors.toList());
+              System.out.println();
+      
+              System.out.println("Enter the data again to complete the registration");
+              while (true) {
+                  System.out.println("Login:");
+                  String loginTrial = cleanLogin(getInput(scanner));
+      
+                  System.out.println("Password:");
+                  String passwordTrial = getInput(scanner);
+      
+                  if (!login.equalsIgnoreCase(loginTrial) && !password.equalsIgnoreCase(passwordTrial)) {
+                      System.out.println();
+                      System.out.println("Login and password don't match.");
+                  } else if (!login.equalsIgnoreCase(loginTrial)) {
+                      System.out.println();
+                      System.out.println("Login doesn't match.");
+                  } else if (!password.equalsIgnoreCase(passwordTrial)) {
+                      System.out.println();
+                      System.out.println("Passwords don't match");
+                  }
+      
+                  if (login.equalsIgnoreCase(loginTrial) && password.equalsIgnoreCase(passwordTrial)) {
+                      break;
+                  }
+              }
+      
+              System.out.println();
+              System.out.println("Congratulations on your successful registration!");
+              System.out.println("Now you can log in!");
+              System.out.println();
+      
+              while (true) {
+                  System.out.println("Authorization");
+                  System.out.println("Login:");
+                  String loginFinish = cleanLogin(getInput(scanner));
+      
+                  System.out.println("Password:");
+                  String passwordFinish = getInput(scanner);
+      
+                  if (login.equalsIgnoreCase(loginFinish) && password.equalsIgnoreCase(passwordFinish)) {
+                      successAuthorizationRandomText();
+                      menuAfterSuccessLogin(scanner);
+                      break;
+                  } else {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+                  }
+              }
+          }
+      
+          static void loginChoice(Scanner scanner, List<UserDetail> userDetailList, String filePath) throws IOException {
+      
+              while (true) {
+                  System.out.println("Authorization");
+                  System.out.println("Login:");
+                  String loginInput = cleanLogin(getInput(scanner));
+      
+                  Optional<UserDetail> userDetailOptional= userDetailList.stream()
+                          .filter(userDetail -> Objects.equals(userDetail.getLogin(), loginInput))
+                          .findFirst();
+                  String userDetailLogin = userDetailOptional.map(UserDetail::getLogin).orElse(null);
+      
+      
+                  System.out.println("Password:");
+                  String passwordInput = getInput(scanner);
+                  String userDetailPassword = userDetailOptional.map(UserDetail::getPassword).orElse(null);
+                  String userDetailSalt = userDetailOptional.map(UserDetail::getSalt).orElse(null);
+                  byte[] saltBytes = Base64.getDecoder().decode(userDetailSalt);
+                  String hashOfPasswordInput = hashPassword(passwordInput, saltBytes);
+      
+                  if (!Objects.equals(userDetailLogin, loginInput) || !Objects.equals(userDetailPassword, hashOfPasswordInput)) {
+                      System.out.println("The entered password does not match the login or the user does not exist.");
+                  } else {
+                      break;
+                  }
+              }
+      
+              successAuthorizationRandomText();
+              menuAfterSuccessLogin(scanner);
+          }
+      
+          static void successAuthorizationRandomText() {
+              System.out.println("Authorization successful");
+              System.out.println();
+              int randomIndex = getRandomIndex(loginGreetings.length);
+              String randomGreeting = loginGreetings[randomIndex];
+              System.out.println(randomGreeting);
+          }
+      
+          static void menuAfterSuccessLogin(Scanner scanner) {
+              System.out.println("Menu");
+              System.out.println("1. Logout");
+              while (true) {
+                  String choice = getInput(scanner);
+                  if (Objects.equals("1", choice)) {
+                      System.out.println("Goodbye");
+                      return;
+                  } else {
+                      System.out.println("Invalid choice. Please enter a valid option number '1':");
+                  }
+              }
+          }
+      
+          static String getLoginInputRecursive(List<String> usernames, Scanner scanner) {
+              System.out.println("Login:");
+              String login = cleanLogin(getInput(scanner));
+      
+              if (!isValidPhoneNumber(login)) {
+                  System.out.println("Wrong login format, try again");
+                  return getLoginInputRecursive(usernames, scanner);
+              }
+      
+              if (usernames.contains(login) || usernames.contains("+" + login)) {
+                  System.out.println("Login is already taken, try another login");
+                  return getLoginInputRecursive(usernames, scanner);
+              }
+      
+              return login;
+          }
+      
+          static String getPasswordInputRecursive(Scanner scanner) {
+              System.out.println("Password:");
+              String password = getInput(scanner).trim();
+              if (!isValidPassword(password)){
+                  System.out.println("Wrong password format, try again");
+                  return getPasswordInputRecursive(scanner);
+              }
+              return password;
+          }
+      }
+    learner_created: true
+  - name: src/banking/ExchangeRates.java
+    visible: true
+    learner_created: true
+  - name: src/banking/Rate.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/projects/386/stages/2298/implement#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sat, 09 Mar 2024 20:09:06 UTC"
+record: 4
